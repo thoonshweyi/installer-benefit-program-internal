@@ -111,7 +111,7 @@
                         {{-- @can('view-installer-card') --}}
                         <li class="{{ (strpos(Route::currentRouteName(), 'homeowners.index') === 0)  ? 'active' : ''}}">
                             <a href="{{route('homeowners.index')}}">
-                                <i class="las la-minus"></i><span>{{__('nav.installer_card_list')}}</span>
+                                <i class="las la-minus"></i><span>{{__('nav.home_owner_list')}}</span>
                             </a>
                         </li>
                         {{-- @endcan --}}

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+
 class HomeOwner extends Model
 {
     use HasFactory;
@@ -13,7 +13,7 @@ class HomeOwner extends Model
      protected $table = "home_owners";
      protected $fillable = [
         'uuid',
-         'branch_id',
+        'branch_id',
 
          'fullname',
          'phone',
@@ -84,4 +84,5 @@ class HomeOwner extends Model
      public function installercardfiles(){
          return $this->hasMany(InstallerCardFile::class,"installer_card_card_number","card_number");
      }
+
 }

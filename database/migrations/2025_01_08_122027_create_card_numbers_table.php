@@ -16,6 +16,7 @@ class CreateCardNumbersTable extends Migration
         Schema::create('card_numbers', function (Blueprint $table) {
             $table->id();
             $table->string("card_number")->unique();
+            $table->string("image");
             $table->uuid("card_number_generator_uuid");
             $table->timestamps();
         });

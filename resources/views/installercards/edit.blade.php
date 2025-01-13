@@ -286,7 +286,7 @@
                                                         {{ ++$idx }}
                                                     </td>
 
-                                                    <td>{{ $homeownerinstaller->homeowner->fullname }}</td>
+                                                    <td><a href="{{ route('homeowners.edit',$homeownerinstaller->homeowner->uuid) }}"  class="text-underline" style="text-underline-offset: 5px;">{{ $homeownerinstaller->homeowner->fullname }}</a></td>
                                                     <td>{{ $homeownerinstaller->homeowner->phone }}</td>
                                                 </tr>
                                             @endforeach

@@ -11,6 +11,7 @@ class CardNumber extends Model
     protected $table = "card_numbers";
     protected $fillable = [
         'card_number',
+        'image',
         'card_number_generator_uuid',
     ];
 

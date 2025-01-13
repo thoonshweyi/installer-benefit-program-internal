@@ -30,43 +30,69 @@ class CardNumberGeneratorsController extends Controller
     public function store(Request $request){
         // dd($request);
         $request->validate([
-            'for_branch_id' => 'required',
+            'to_branch_id' => 'required',
             'quantity' => "required",
             'random'=>"required"
         ]);
 
+        \DB::begincardnumbergenerator();
+        try{
 
-        $branch_id = getCurrentBranch();
-        $for_branch_id = $request->for_branch_id;
-        $quantity = $request->quantity;
-        $random = $request->random;
-        $user = Auth::user();
-        $user_uuid = $user->uuid;
-        $remark = $request->remark;
+            $branch_id = getCurrentBranch();
+            $to_branch_id = $request->to_branch_id;
+            $quantity = $request->quantity;
+            $random = $request->random;
+            $user = Auth::user();
+            $user_uuid = $user->uuid;
+            $remark = $request->remark;
 
-        $cardnumbergenerator = CardNumberGenerator::create([
-            "uuid"=> (string) Str::uuid(),
-            "branch_id"=> $branch_id,
-            // 'document_no' => $this->generate_doc_no($branch_id),
-            "for_branch_id"=> $for_branch_id,
-            "quantity"=> $quantity,
-            "random"=> $random,
-            'status' => 'pending',
-            'prepare_by' => $user_uuid,
-            "remark"=> $remark
-        ]);
-
-        $cardnumbers = $this->generate_card_number($for_branch_id,$quantity);
-        // dd($cardnumbers);
-        foreach($cardnumbers as $cardnumber){
-            $cardnumber = CardNumber::create([
-                'card_number'=> $cardnumber,
-                'card_number_generator_uuid'=> $cardnumbergenerator->uuid
+            $cardnumbergenerator = CardNumberGenerator::create([
+                "uuid"=> (string) Str::uuid(),
+                "branch_id"=> $branch_id,
+                // 'document_no' => $this->generate_doc_no($branch_id),
+                "to_branch_id"=> $to_branch_id,
+                "quantity"=> $quantity,
+                "random"=> $random,
+                'status' => 'pending',
+                'prepare_by' => $user_uuid,
+                "remark"=> $remark
             ]);
-        }
 
-        return redirect()->route('cardnumbergenerators.index')->with('success','New Cards Created Successfully');
+            $cardnumbers = $this->generate_card_number($to_branch_id,$quantity);
+            // dd($cardnumbers);
+            foreach($cardnumbers as $cardnumber){
+                $cardnumberObj = new CardNumber();
+                $cardnumberObj->card_number = $cardnumber;
+                $cardnumberObj->card_number_generator_uuid =  $cardnumbergenerator->uuid;
+
+
+                $text = $cardnumber; // Replace with your specific text
+                $qrCode = QrCode::format('png')->size(100)->generate($text);
+                $qr_file_path = public_path("assets/img/cardnumbers/{$cardnumber}.png");
+                $filepath = "assets/img/cardnumbers/{$cardnumber}.png";
+                // Ensure the directory exists
+                if (!file_exists(dirname($qr_file_path))) {
+                    mkdir(dirname($qr_file_path), 0755, true);
+                }
+                // Save QR code image to the file path
+                file_put_contents($qr_file_path, $qrCode);
+
+                // Save cardnumberObj to the database
+                $cardnumberObj->image = $filepath;
+                $cardnumberObj->save();
+
+            }
+
+            \DB::commit();
+            return redirect()->route('cardnumbergenerators.index')->with('success','New Cards Created Successfully');
+
+        }catch(Exception $err){
+            \DB::rollback();
+
+            return redirect()->route('pointpromos.index')->with("error","There is an error in creation Point Promotion");
+        }
     }
+
 
     public function edit($uuid){
         $cardnumbergenerator = CardNumberGenerator::where('uuid',$uuid)->orderBy('id','asc')->first();
@@ -74,9 +100,9 @@ class CardNumberGeneratorsController extends Controller
 
         $cardnumbers = CardNumber::where('card_number_generator_uuid',$uuid)->get();
 
-        $qrviews = $this->generateQrCodeView($cardnumbers);
+        // $qrviews = $this->generateQrCodeView($cardnumbers);
 
-        return view("cardnumbergenerators.edit",compact('cardnumbergenerator',"branches","qrviews"));
+        return view("cardnumbergenerators.edit",compact('cardnumbergenerator',"branches","cardnumbers"));
     }
 
 
@@ -88,18 +114,18 @@ class CardNumberGeneratorsController extends Controller
 
 
     //     // Query the latest document for the branch from today
-    //     $lasttransaction = RedemptionTransaction::where('branch_id', $branch_id)
+    //     $lastcardnumbergenerator = Redemptioncardnumbergenerator::where('branch_id', $branch_id)
     //                             ->whereDate('created_at', Carbon::today())
     //                             ->orderBy('document_no', 'desc')
     //                             ->first();
-    //     // dd($lasttransaction);
+    //     // dd($lastcardnumbergenerator);
 
     //     // Set initial suffix
     //     $newSuffix = '0001';
 
-    //     if ($lasttransaction) {
+    //     if ($lastcardnumbergenerator) {
     //         // Extract the numeric suffix from the last document number
-    //         $lastSuffix = (int) substr($lasttransaction->document_no, -4);
+    //         $lastSuffix = (int) substr($lastcardnumbergenerator->document_no, -4);
 
     //         // Increment the suffix by 1 and pad with zeros
     //         $newSuffix = str_pad($lastSuffix + 1, 4, '0', STR_PAD_LEFT);
@@ -111,8 +137,8 @@ class CardNumberGeneratorsController extends Controller
     //     return $documentNumber;
     // }
 
-    public static function generate_card_number($for_branch_id,$quantity){
-        $prefix = getCardPrefix($for_branch_id);
+    public static function generate_card_number($to_branch_id,$quantity){
+        $prefix = getCardPrefix($to_branch_id);
         $randomstring = randomstringgenerator(7);
         $card_numbers = [];
 
@@ -128,21 +154,6 @@ class CardNumberGeneratorsController extends Controller
         return $card_numbers;
     }
 
-
-
-    protected static function generatestudentid(){
-        return \DB::transaction(function(){
-            $lateststudent = \DB::table("students")->orderBy("id","desc")->first();
-            $latestid= $lateststudent ?  $lateststudent->id : 0;
-            $newstudentid = "WDF".str_pad($latestid+1,5,"0",STR_PAD_LEFT);
-
-            while(\DB::table("students")->where("regnumber",$newstudentid)->exists()){
-                $latestid++;
-                $newstudentid = "WDF".str_pad($latestid+1,5,"0",STR_PAD_LEFT);
-            }
-            return $newstudentid;
-        });
-    }
 
     public function generateQrCodeView($cardnumbers)
     {
@@ -165,11 +176,61 @@ class CardNumberGeneratorsController extends Controller
         // dd("Excel Exported");
         $cardnumbergenerator = CardNumberGenerator::where('uuid',$uuid)->orderBy('id','asc')->first();
         $cardnumbers = CardNumber::where('card_number_generator_uuid',$uuid)->get();
-        $qrViews = $this->generateQrCodeView($cardnumbers);
+        // $qrViews = $this->generateQrCodeView($cardnumbers);
+
+        $cardnumbergenerator->update([
+            "status"=>"exported",
+        ]);
 
 
-        return Excel::download(new CardNumbersExport($cardnumbers, $qrViews), 'card_numbers.xlsx');
+        return Excel::download(new CardNumbersExport($cardnumbers), "$cardnumbergenerator->document_no.xlsx");
     }
 
+
+    public function approveCardNumberGenerator($uuid,Request $request){
+
+        $user = Auth::user();
+        $user_uuid = $user->uuid;
+        $cardnumbergenerator = CardNumberGenerator::where("uuid",$uuid)->first();
+        // dd($cardnumbergenerator);
+        $cardnumbergenerator->update([
+            "status"=>"approved",
+            "approved_by"=>$user_uuid,
+            "approved_date"=>now(),
+            "mkt_mgr_remark"=>$request->remark
+        ]);
+
+        // readIRENotification($uuid);
+        // sendIRENotification('Finance',$cardnumbergenerator);
+
+
+        return redirect()->back();
+
+    }
+
+    public function rejectCardNumberGenerator($uuid,$step,Request $request){
+        // dd('hay');
+
+        $user = Auth::user();
+        $user_uuid = $user->uuid;
+        $cardnumbergenerator = CardNumberGenerator::where("uuid",$uuid)->first();
+        // dd($cardnumbergenerator);
+
+        if($step == 'mkt-mgr'){
+            $cardnumbergenerator->update([
+                "status"=>"rejected",
+                "approved_by"=>$user_uuid,
+                "approved_date"=>now(),
+                "mkt_mgr_remark"=>$request->remark
+            ]);
+
+        }
+
+        // readIRENotification($uuid);
+        // sendIRESingleUserNotification($cardnumbergenerator->prepare_by,$cardnumbergenerator);
+
+        return redirect()->back();
+
+    }
 
 }

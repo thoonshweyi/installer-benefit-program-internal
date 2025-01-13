@@ -52,6 +52,7 @@ return [
 
     'home_owners'=>'Home Owners',
     'create_home_owners'=>'Create Home Owner',
+    'home_owner_list' => 'Home Owner List',
 
 
     'point_promotions' => 'Point Promotions',
