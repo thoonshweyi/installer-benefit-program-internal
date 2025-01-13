@@ -36,5 +36,5 @@ yarn-error.log
 /.idea
 /.vscode
 public/tickets
-storage/logs/laravel.log
+**/*.log
 storage/app/tickets
