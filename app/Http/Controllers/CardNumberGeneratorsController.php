@@ -35,7 +35,7 @@ class CardNumberGeneratorsController extends Controller
             'random'=>"required"
         ]);
 
-        \DB::begincardnumbergenerator();
+        \DB::beginTransaction();
         try{
 
             $branch_id = getCurrentBranch();

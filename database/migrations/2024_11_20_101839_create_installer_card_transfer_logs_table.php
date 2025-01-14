@@ -19,6 +19,7 @@ class CreateInstallerCardTransferLogsTable extends Migration
     {
         Schema::create('installer_card_transfer_logs', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->enum('transfer_type', ['change', 'lost']);
             $table->string('old_installer_card_card_number');
             $table->string('new_installer_card_card_number');

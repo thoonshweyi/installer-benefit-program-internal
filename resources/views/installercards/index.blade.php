@@ -193,28 +193,44 @@
                       </div>
 
                       <div class="modal-body">
-                           <form id="transferform" action="" method="POST">
+                           <form id="transferform" action="" method="POST" enctype="multipart/form-data">
                                 {{ csrf_field() }}
                                 <div class="row align-items-end">
 
                                         <div class="col-md-12 form-group mb-3">
-                                            <label for="new_installer_card_card_number">Transfer Type<span class="text-danger">*</span></label>
+                                            <label for="transfer_type">Transfer Type<span class="text-danger">*</span></label>
                                             <select name="transfer_type" id="transfer_type" class="form-control form-control-sm rounded-0">
                                                 <option value="" selected disabled>Choose Transfer Type</option>
-                                                <option value="change">Change</option>
-                                                <option value="lost">Lost</option>
+                                                <option value="change" {{ old("transfer_type") == "change" ? 'selected' : "" }}>Change</option>
+                                                <option value="lost" {{ old("transfer_type") == "lost" ? 'selected' : "" }}>Lost</option>
                                             </select>
+                                            @error("transfer_type")
+                                            <b class="text-danger">{{ $message }}</b>
+                                            @enderror
                                         </div>
                                         <div class="col-md-12 form-group mb-3">
                                             <label for="old_installer_card_card_number">Old Card Number<span class="text-danger">*</span></label>
                                             <input type="text" name="old_installer_card_card_number" id="old_installer_card_card_number" class="form-control form-control-sm rounded-0" value="{{ old('old_installer_card_card_number') }}" readonly/>
+                                            @error("old_installer_card_card_number")
+                                            <b class="text-danger">{{ $message }}</b>
+                                            @enderror
                                         </div>
 
                                      <div class="col-md-12 form-group mb-3">
                                           <label for="new_installer_card_card_number">New Card Number<span class="text-danger">*</span></label>
                                           <input type="text" name="new_installer_card_card_number" id="new_installer_card_card_number" class="form-control form-control-sm rounded-0" placeholder="Scan New Card" value="{{ old('new_installer_card_card_number') }}" readonly/>
-                                     </div>
+                                          @error("new_installer_card_card_number")
+                                          <b class="text-danger">{{ $message }}</b>
+                                          @enderror
+                                    </div>
 
+                                     <div class="col-md-12">
+                                        <label for="images" class="gallery @error('images') is-invalid @enderror"><span>Choose Images</span></label>
+                                        <input type="file" name="images[]" id="images" class="form-control form-control-sm rounded-0" value="" multiple hidden/>
+                                        @error("images")
+                                            <b class="text-danger">{{ $message }}</b>
+                                        @enderror
+                                    </div>
 
 
                                      <div class="col-md-12 text-sm-end text-start mb-3">
@@ -325,6 +341,9 @@
                         if (event.key !== 'Enter') {
 
                             var currentTime = new Date().getTime();
+                            if(inputField.val() != '' && !(currentTime - lastKeyTime <= 50)){
+                                inputField.val('');
+                            }
 
                             if (currentTime - lastKeyTime <= 50 || inputField.val() === '') {
                                 inputField.val(inputField.val() + event.key);
@@ -352,6 +371,44 @@
             $('#transfer_type').change(function(){
                 $('#new_installer_card_card_number').focus();
             });
+
+
+            {{-- Start Preview Image --}}
+
+            var previewimages = function(input,output){
+
+                // console.log(input.files);
+
+                if(input.files){
+                     var totalfiles = input.files.length;
+                     // console.log(totalfiles);
+                     if(totalfiles > 0){
+                          $('.gallery').addClass('removetxt');
+                     }else{
+                          $('.gallery').removeClass('removetxt');
+                     }
+                     console.log(input.files);
+
+                     for(var i = 0 ; i < totalfiles ; i++){
+                          var filereader = new FileReader();
+
+
+                          filereader.onload = function(e){
+                               // $(output).html("");
+                               $($.parseHTML('<img>')).attr('src',e.target.result).appendTo(output);
+                          }
+
+                          filereader.readAsDataURL(input.files[i]);
+
+                     }
+                }
+
+           };
+
+            $('#images').change(function(){
+                    previewimages(this,'.gallery');
+            });
+            {{-- End Preview Image --}}
     });
 </script>
 @endsection
