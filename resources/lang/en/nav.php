@@ -77,4 +77,6 @@ return [
 
     'card_number_generators'=>'Card Number Generators',
     'create_card_number_generators'=>'Create Card Number Generator',
+    'card_number_generator_list'=>'Card Number Generator List',
+
 ];

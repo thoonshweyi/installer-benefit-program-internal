@@ -91,8 +91,8 @@
             {{-- @can('view-home-owner') --}}
                 <li class="{{ (strpos(Route::currentRouteName(), 'homeowners.index') === 0) || (strpos(Route::currentRouteName(), 'homeowners.edit') === 0)  ? 'active' : ''}}">
                     <a href="#new_homeowner" class="text-wrap collapsed" data-toggle="collapse" aria-expanded="false">
-                        {{-- <i class="fas fa-gifts"></i> --}}
-                        <i class="fas fa-id-card"></i>
+                        {{-- <i class="ri-home-4-line"></i> --}}
+                        <img src="{{ asset('images/people_16187113.png') }}" alt="" width="20" height="20"/>
                         <span class="ml-4 text-wrap">{{__('nav.home_owners')}}</span>
                         <svg class="svg-icon iq-arrow-right arrow-active" width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="10 15 15 20 20 15"></polyline>
@@ -143,7 +143,7 @@
                     {{-- @can('view-installer-card') --}}
                     <li class="{{ (strpos(Route::currentRouteName(), 'cardnumbergenerators.index') === 0)  ? 'active' : ''}}">
                         <a href="{{route('cardnumbergenerators.index')}}">
-                            <i class="las la-minus"></i><span>{{__('nav.card_number_generators')}}</span>
+                            <i class="las la-minus"></i><span>{{__('nav.card_number_generator_list')}}</span>
                         </a>
                     </li>
                     {{-- @endcan --}}

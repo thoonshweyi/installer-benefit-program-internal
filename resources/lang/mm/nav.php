@@ -78,7 +78,9 @@ return [
 
     'faqs'=> "အမေးများသောမေးခွန်းများ",
 
-    'card_number_generators'=>'Card Number Generators',
-    'create_card_number_generators'=>'Create Card Number Generator',
+    'card_number_generators'=>'ကတ်ထုတ်ယူမှုများ',
+    'create_card_number_generators'=>'ကတ်ထုတ်ယူမှု ဖန်တီးရန်',
+    'card_number_generator_list'=>'ကတ်ထုတ်ယူမှု စာရင်း',
+
 
 ];
