@@ -123,15 +123,15 @@
 
                                         <td>{{ $cardnumbergenerator->branch->branch_name_eng }}</td>
                                         <td>{{ $cardnumbergenerator->document_no }}</td>
-                                        <td>{{ $cardnumbergenerator->forbranch->branch_name_eng }}</td>
+                                        <td>{{ $cardnumbergenerator->tobranch->branch_name_eng }}</td>
                                         <td>{{ $cardnumbergenerator->quantity }}</td>
                                         <td>
                                             {!! $cardnumbergenerator->status == "pending" ?
-                                                "<span class='badge bg-warning'>$cardnumbergenerator->status</span>" :
-                                                ($cardnumbergenerator->status == "approved" ? "<span class='badge bg-success'>$cardnumbergenerator->status</span>" :
-                                                ($cardnumbergenerator->status == "rejected"? "<span class='badge bg-danger'>$cardnumbergenerator->status</span>" : ""
-
-                                                )) !!}
+                                            "<span class='badge bg-warning'>$cardnumbergenerator->status</span>" :
+                                            ($cardnumbergenerator->status == "approved" ? "<span class='badge bg-success'>$cardnumbergenerator->status</span>" :
+                                            ($cardnumbergenerator->status == "rejected"? "<span class='badge bg-danger'>$cardnumbergenerator->status</span>" :
+                                            ($cardnumbergenerator->status == "exported"? "<span class='badge bg-secondary'>$cardnumbergenerator->status</span>" : ""
+                                            ))) !!}
                                         </td>
                                         <td>{{ $cardnumbergenerator->prepareby->name  }}</td>
                                         <td>{{  \Carbon\Carbon::parse($cardnumbergenerator->created_at)->format('d-m-Y') }}</td>

@@ -12,6 +12,7 @@ class InstallerCardTransferLog extends Model
 
     protected $table = "installer_card_transfer_logs";
     protected $fillable = [
+        'uuid',
         'transfer_type',
         'old_installer_card_card_number',
         'new_installer_card_card_number',

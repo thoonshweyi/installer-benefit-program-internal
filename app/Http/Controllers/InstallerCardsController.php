@@ -35,6 +35,7 @@ use App\Models\POS108\Pos108GbhCustomer;
 use App\Models\POS112\Pos112GbhCustomer;
 use App\Models\POS113\Pos113GbhCustomer;
 use App\Models\POS114\Pos114GbhCustomer;
+use App\Models\InstallerCardTransferFile;
 
 class InstallerCardsController extends Controller
 {
@@ -203,12 +204,13 @@ class InstallerCardsController extends Controller
 
 
         // Update Other Card Status as Inactive
-        $otherinstallercards = InstallerCard::where('gbh_customer_id',$installercard->gbh_customer_id)->where("card_number","!=",$installercard->card_number);
-        if ($otherinstallercards->exists()) {
+        $otherinstallercards = InstallerCard::where('gbh_customer_id',$installercard->gbh_customer_id)->where("card_number","!=",$installercard->card_number)->get();
+        foreach($otherinstallercards as $otherinstallercard){
             // Update all matching rows' status to inactive (status = 0) in one query
-            $otherinstallercards->update([
+            $otherinstallercard->update([
                 'status' => 0
             ]);
+            dispatch(new SyncRowJob("installer_cards","update",$otherinstallercard));
         }
 
 
@@ -501,8 +503,8 @@ class InstallerCardsController extends Controller
     //             "installer_card_card_number"=>$new_installer_card->card_number
     //         ]);
 
-    //         $old_return_product_records = ReturnBanner::where('installer_card_card_number',$old_installer_card_card_number);
-    //         $old_return_product_records->update([
+    //         $old_return_banners = ReturnBanner::where('installer_card_card_number',$old_installer_card_card_number);
+    //         $old_return_banners->update([
     //             "installer_card_card_number"=>$new_installer_card->card_number
     //         ]);
 
@@ -546,16 +548,19 @@ class InstallerCardsController extends Controller
     public function transfer(Request $request,$old_installer_card_card_number){
         // dd($old_installer_card_card_number);
         $request->validate([
+            "old_installer_card_card_number"=>"required",
             "new_installer_card_card_number"=>"required",
-            'transfer_type'=>"required"
+            'transfer_type'=>"required",
+            "images" => "required|array",
+            "images.*"=>"image|mimes:jpg,jpeg,png|max:1024",
         ]);
 
         \DB::beginTransaction();
         try{
 
             $user = Auth::user();
+            $user_id = $user->id;
             $user_uuid = $user->uuid;
-
 
             $old_installer_card = InstallerCard::where('card_number',$old_installer_card_card_number)
                                     ->orderBy('id','asc')->first();
@@ -593,7 +598,10 @@ class InstallerCardsController extends Controller
                     "installer_card_card_number"=>$new_installer_card->card_number
                 ]);
                 $new_collection_transaction->save();
+                dispatch(new SyncRowJob("collection_transactions","insert",$new_collection_transaction));
+
                 $old_collection_transaction->delete();
+                dispatch(new SyncRowJob("collection_transactions","update",$old_collection_transaction));
             }
 
 
@@ -607,7 +615,10 @@ class InstallerCardsController extends Controller
                     "installer_card_card_number"=>$new_installer_card->card_number
                 ]);
                 $new_installer_card_point->save();
+                dispatch(new SyncRowJob("installer_card_points","insert",$new_installer_card_point));
+
                 $old_installer_card_point->delete();
+                dispatch(new SyncRowJob("installer_card_points","update",$old_installer_card_point));
             }
 
 
@@ -620,38 +631,33 @@ class InstallerCardsController extends Controller
                     "installer_card_card_number"=>$new_installer_card->card_number
                 ]);
                 $new_redemption_transaction->save();
+                dispatch(new SyncRowJob("redemption_transactions","insert",$new_redemption_transaction));
+
+
                 $old_redemption_transaction->delete();
+                dispatch(new SyncRowJob("redemption_transactions","update",$old_redemption_transaction));
             }
 
-            $old_return_product_records = ReturnBanner::where('installer_card_card_number',$old_installer_card_card_number)
+            $old_return_banners = ReturnBanner::where('installer_card_card_number',$old_installer_card_card_number)
                                             ->orderBy('created_at','asc')
                                             ->orderBy('id','asc')
                                             ->get();
-            foreach($old_return_product_records as $old_return_product_record){
-                $new_return_product_record = $old_return_product_record->replicate()->fill([
+            foreach($old_return_banners as $old_return_banner){
+                $new_return_banner = $old_return_banner->replicate()->fill([
                     "installer_card_card_number"=>$new_installer_card->card_number
                 ]);
-                $new_return_product_record->save();
-                $old_return_product_record->delete();
+                $new_return_banner->save();
+                dispatch(new SyncRowJob("return_banners","insert",$new_return_banner));
+
+
+                $old_return_banner->delete();
+                dispatch(new SyncRowJob("return_banners","update",$old_return_banner));
             }
 
-            $new_installer_card->update([
-                'totalpoints'=>$old_installer_card->totalpoints,
-                'totalamount'=>$old_installer_card->totalamount,
-                'credit_points'=>$old_installer_card->credit_points,
-                'credit_amount'=>$old_installer_card->credit_amount,
-                'status'=>1
-            ]);
 
-            $old_installer_card->update([
-                'totalpoints'=>0,
-                'totalamount'=>0,
-                'credit_points'=>0,
-                'credit_amount'=>0,
-                'status'=>0
-            ]);
 
-            InstallerCardTransferLog::create([
+            $installercardtransferlog = InstallerCardTransferLog::create([
+                'uuid' => (string) Str::uuid(),
                 'transfer_type'=>$request->transfer_type,
                 'old_installer_card_card_number'=>$old_installer_card_card_number,
                 'new_installer_card_card_number'=>$new_installer_card->card_number,
@@ -661,6 +667,47 @@ class InstallerCardsController extends Controller
                 'transferred_credit_amount'=>$old_installer_card->credit_amount,
                 'user_uuid'=>$user_uuid
             ]);
+            $new_installer_card->update([
+                'totalpoints'=>$old_installer_card->totalpoints,
+                'totalamount'=>$old_installer_card->totalamount,
+                'credit_points'=>$old_installer_card->credit_points,
+                'credit_amount'=>$old_installer_card->credit_amount,
+                'status'=>1
+            ]);
+            dispatch(new SyncRowJob("installer_cards","update",$new_installer_card));
+
+
+            $old_installer_card->update([
+                'totalpoints'=>0,
+                'totalamount'=>0,
+                'credit_points'=>0,
+                'credit_amount'=>0,
+                'status'=>0
+            ]);
+            dispatch(new SyncRowJob("installer_cards","update",$old_installer_card));
+
+
+            // Multi Images Upload
+            if($request->hasFile('images')){
+                foreach($request->file("images") as $image){
+                     $installercardtransferfile = new InstallerCardTransferFile();
+                     $installercardtransferfile->installer_card_transfer_log_uuid = $installercardtransferlog->uuid;
+
+                     $file = $image;
+                     $fname = $file->getClientOriginalName();
+                     $imagenewname = uniqid($user_id).$installercardtransferlog['id'].$fname;
+                     $file->move(public_path('assets/img/installercardtransfers/'),$imagenewname);
+
+
+                     $filepath = 'assets/img/installercardtransfers/'.$imagenewname;
+                     $installercardtransferfile->image = $filepath;
+
+                     $installercardtransferfile->save();
+                    // dispatch(new SyncRowJob("redemption_transaction_files","insert",$installercardtransferfile));
+                }
+
+           }
+
             \DB::commit();
 
             return redirect()->route('installercards.index')->with("success", "New installer card is successfully transferred.");;

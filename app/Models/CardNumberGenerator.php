@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,7 +18,7 @@ class CardNumberGenerator extends Model
         "uuid",
         "branch_id",
         "document_no",
-        "for_branch_id",
+        "to_branch_id",
         "quantity",
         "random",
         "status",
@@ -72,8 +73,8 @@ class CardNumberGenerator extends Model
         return $this->belongsTo(Branch::class,"branch_id","branch_id");
     }
 
-    public function forbranch(){
-        return $this->belongsTo(Branch::class,"for_branch_id","branch_id");
+    public function tobranch(){
+        return $this->belongsTo(Branch::class,"to_branch_id","branch_id");
     }
 
 
@@ -87,4 +88,36 @@ class CardNumberGenerator extends Model
     public function cardnumbers(){
         return $this->hasMany(CardNumber::class,"card_number_generator_uuid","uuid");
     }
+
+
+
+    public function isApproveAuthUser(){
+
+        $user = Auth::user();
+
+        // dd($user->roles);
+        // Check if the user's branch matches the transaction's branch
+        $belongsToBranch = BranchUser::where('user_uuid', $user->uuid)
+                            ->where('branch_id', $this->branch_id)
+                            ->exists();
+
+        // Check if the user has the Branch Manager role
+        $isMktManager = $user->roles()->where('name', 'Marketing Manager')->exists();
+         // Return true if both conditions are met
+         return $belongsToBranch && $isMktManager;
+    }
+
+
+    public function isFinishedAuthUser(){
+
+        $user = Auth::user();
+
+        $prepareby_user = User::where("uuid",$this->prepare_by)->first();
+
+
+        return ($user == $prepareby_user);
+
+    }
+
+
 }

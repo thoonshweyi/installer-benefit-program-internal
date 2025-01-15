@@ -180,5 +180,6 @@ Route::group(['middleware' => ['auth','customauth.currentbranch']], function () 
     Route::get("/cardnumbergenerators/{cardnumbergenerator}",[CardNumberGeneratorsController::class,'show'])->name('cardnumbergenerators.show');
     // Route::delete("/cardnumbergenerators/{cardnumbergenerator}",[CardNumberGeneratorsController::class,'destroy'])->name('cardnumbergenerators.destroy');
     Route::get('/cardnumbergenerators/{uuid}/export',[CardNumberGeneratorsController::class,"export"])->name("cardnumbergenerators.export");
-
+    Route::post("/cardnumbergenerators/{cardnumbergenerator}/approveCardNumberGenerator",[CardNumberGeneratorsController::class,'approveCardNumberGenerator'])->name('cardnumbergenerators.approveCardNumberGenerator');
+    Route::post("/cardnumbergenerators/{cardnumbergenerator}/rejectCardNumberGenerator/{step}",[CardNumberGeneratorsController::class,'rejectCardNumberGenerator'])->name('cardnumbergenerators.rejectCardNumberGenerator');
 });

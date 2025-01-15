@@ -239,6 +239,8 @@ class PointPromotionsController extends Controller
             $pointpromotion->remark = $request->remark;
             $pointpromotion->user_uuid = $user_uuid;
             $pointpromotion->save();
+            dispatch(new SyncRowJob("point_promotions","update",$pointpromotion));
+
 
             $pointpromotion->pointpromotionbranches()->delete();
             $branch_ids = $request->branch_id;
@@ -293,7 +295,10 @@ class PointPromotionsController extends Controller
     public function destroy($uuid)
     {
         $pointpromotion = PointPromotion::where('uuid',$uuid)->first();
+        $pointpromotionId = $pointpromotion->id;
         $pointpromotion->delete();
+        dispatch(new SyncRowJob("point_promotions", "delete", ['id' => $pointpromotionId]));
+
         return redirect()->route('pointpromos.index')->with("success","Point Promotion deleted successfully");
     }
 

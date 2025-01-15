@@ -54,6 +54,7 @@ return [
 
     'home_owners'=>'အိမ်ရှင်များ',
     'create_home_owners'=>'အိမ်ရှင်ဖန်တီးရန်',
+    'home_owner_list' => 'အိမ်ရှင် စာရင်း',
 
 
     'point_promotions' => 'ပွိုင့် ပရိုမိုးရှင်း များ',

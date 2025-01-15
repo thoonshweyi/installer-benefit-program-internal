@@ -18,10 +18,10 @@ class CreateCardNumberGeneratorsTable extends Migration
             $table->uuid("uuid");
             $table->tinyInteger('branch_id');
             $table->string('document_no');
-            $table->tinyInteger('for_branch_id');
+            $table->tinyInteger('to_branch_id');
             $table->unsignedBigInteger('quantity');
             $table->tinyInteger('random');
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'rejected','exported'])->default('pending');
             $table->uuid('prepare_by');
             $table->uuid('approved_by')->nullable();
             $table->dateTime("approved_date")->nullable();

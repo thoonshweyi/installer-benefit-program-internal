@@ -8,17 +8,17 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithEvents;
-class CardNumbersExport implements FromCollection, WithHeadings, WithDrawings, ShouldAutoSize,WithColumnWidths,WithEvents
+
+class CardNumbersExport implements FromCollection, WithHeadings, WithDrawings, ShouldAutoSize, WithColumnWidths, WithEvents
 {
     private $cardNumbers; // Card numbers collection
-    private $qrViews;     // QR images as base64 strings
 
-    public function __construct($cardNumbers, $qrViews)
+    public function __construct($cardNumbers)
     {
         $this->cardNumbers = $cardNumbers;
-        $this->qrViews = $qrViews;
     }
 
     // Data rows
@@ -48,45 +48,39 @@ class CardNumbersExport implements FromCollection, WithHeadings, WithDrawings, S
     {
         $drawings = [];
 
-        foreach ($this->qrViews as $index => $qrBase64) {
-            $drawing = new Drawing();
-            $drawing->setName('QR Code');
-            $drawing->setDescription('QR Code');
-            $drawing->setPath($this->saveBase64Image($qrBase64, $index)); // Save base64 image to a temporary file
-            $drawing->setHeight(100);
-            $drawing->setCoordinates('C' . ($index + 2)); // Column C, starting from row 2 (after headings)
-            $drawings[] = $drawing;
+        foreach ($this->cardNumbers as $index => $cardNumber) {
+            $imagePath = public_path($cardNumber->image); // Get the full path of the image
+
+            if (file_exists($imagePath)) {
+                $drawing = new Drawing();
+                $drawing->setName('QR Code');
+                $drawing->setDescription('QR Code');
+                $drawing->setPath($imagePath); // Use the image path from the database
+                $drawing->setHeight(100);
+                $drawing->setCoordinates('C' . ($index + 2)); // Column C, starting from row 2 (after headings)
+                $drawings[] = $drawing;
+            }
         }
 
         return $drawings;
-    }
-
-    // Save the base64 image to a temporary file
-    private function saveBase64Image($base64, $index)
-    {
-        $directory = storage_path('app'); // Ensure this is correct
-        if (!is_dir($directory)) {
-            mkdir($directory, 0755, true); // Create the directory if it doesn't exist
-        }
-
-        $filePath = $directory . "/temp_qr_{$index}.png";
-        file_put_contents($filePath, base64_decode($base64));
-        return $filePath;
     }
 
     public function registerEvents(): array
     {
         return [
             AfterSheet::class => function (AfterSheet $event) {
+                $sheet = $event->sheet->getDelegate();
+                $totalRows = count($this->cardNumbers) + 1; // Include heading row
+
                 // Set row height for all rows
-                foreach (range(2, count($this->cardNumbers) + 1) as $row) {
-                    $event->sheet->getDelegate()->getRowDimension($row)->setRowHeight(100);
+                foreach (range(2, $totalRows) as $row) {
+                    $sheet->getRowDimension($row)->setRowHeight(100);
                 }
 
-                // Optional: Set column widths
-                $event->sheet->getDelegate()->getColumnDimension('A')->setWidth(5);
-                $event->sheet->getDelegate()->getColumnDimension('B')->setWidth(20);
-                $event->sheet->getDelegate()->getColumnDimension('C')->setWidth(100);
+                // Set vertical and horizontal alignment for all columns
+                $sheet->getStyle('A1:C' . $totalRows)
+                    ->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)
+                    ->setHorizontal(Alignment::HORIZONTAL_CENTER);
             },
         ];
     }
@@ -94,7 +88,9 @@ class CardNumbersExport implements FromCollection, WithHeadings, WithDrawings, S
     public function columnWidths(): array
     {
         return [
-            'C' => 30,
+            'A' => 10, // Column A for "No"
+            'B' => 25, // Column B for "Card Number"
+            'C' => 40, // Column C for "QR Code"
         ];
     }
 }
