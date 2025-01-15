@@ -78,8 +78,8 @@ class InstallerCardPointsController extends Controller
         // });
 
 
-        $usedpoints = RedemptionTransaction::where('installer_card_card_number',$cardnumber)->whereIn('status',['paid','finished'])->sum('total_points_redeemed');
-        $usedamount = RedemptionTransaction::where('installer_card_card_number',$cardnumber)->whereIn('status',['paid','finished'])->sum('total_cash_value');
+        $usedpoints = RedemptionTransaction::where('installer_card_card_number',$cardnumber)->where("nature","!=","double profit deduct")->whereIn('status',['paid','finished'])->sum('total_points_redeemed');
+        $usedamount = RedemptionTransaction::where('installer_card_card_number',$cardnumber)->where("nature","!=","double profit deduct")->whereIn('status',['paid','finished'])->sum('total_cash_value');
 
         $installercardpointquery = InstallerCardPoint::query()
                                     ->where('installer_card_card_number',$cardnumber)
@@ -92,6 +92,14 @@ class InstallerCardPointsController extends Controller
                                 ->where("is_redeemed", "0")
                                 ->where("expiry_date", "<=", Carbon::now()->endOfMonth())
                                 ->sum('points_balance');
+
+        $collectedpoints = CollectionTransaction::where('installer_card_card_number',$cardnumber)->sum('total_points_collected');
+        $preusedpoints = abs(InstallerCardPoint::where("installer_card_card_number", $installercard->card_number)
+                            ->where('preused_points',"!=",0)
+                            ->sum('preused_points'));
+        $earnedpoints = $collectedpoints+$preusedpoints;
+        // dd($preusedpoints);
+
         // dd($expiringsoonpoints);
         return view('installercardpoints.detail',compact(
             "installercard",
@@ -105,7 +113,8 @@ class InstallerCardPointsController extends Controller
             'expiredamounts',
             'expiringsoonpoints',
             'collectionSearch',
-            'redemptionSearch'
+            'redemptionSearch',
+            "earnedpoints"
         ));
     }
 
@@ -276,6 +285,8 @@ class InstallerCardPointsController extends Controller
                         'amount_earned'=> $amount_earned,
                         'amount_redeemed'=>0,
                         'amount_balance'=>$amount_earned ,
+                        'preused_points'=>0,
+                        'preused_amount'=>0,
                         'expiry_date'=> Carbon::now()->addMonths(6),
                         'is_redeemed'=> 0,
                         'is_returned'=> 0,
