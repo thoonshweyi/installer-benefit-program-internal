@@ -104,7 +104,7 @@ Route::group(['middleware' => ['auth','customauth.currentbranch']], function () 
 
     Route::post('/homeownerinstallers',[HomeownerInstallersController::class,"store"])->name("homeownerinstallers.store");
     Route::delete('/homeownerinstallers/{id}',[HomeownerInstallersController::class,"destroy"])->name("homeownerinstallers.destroy");
-
+    Route::delete("/homeownerinstallersbulkdeletes",[HomeownerInstallersController::class,"bulkdeletes"])->name("homeownerinstallers.bulkdeletes");
 
 
 

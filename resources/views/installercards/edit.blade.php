@@ -35,13 +35,17 @@
 
                         <div class="card border-0 rounded-0 shadow mb-4">
                             <ul class="nav tab-navs">
-                                 <li class="nav-item">
-                                      <button type="button" id="autoclick" class="tablinks" onclick="gettab(event,'content')">Content</button>
-                                 </li>
+                                <li class="nav-item">
+                                    <button type="button" id="autoclick" class="tablinks" onclick="gettab(event,'content')">Content</button>
+                                </li>
 
-                                 <li class="nav-item">
-                                    <button type="button" class="tablinks" onclick="gettab(event,'installer_homeowner')">Installer   <img src="{{ asset('images/handshake.png') }}" alt="" width="20" height="20"> Home Owner</button>
-                               </li>
+                                <li class="nav-item">
+                                    <button type="button" class="tablinks" onclick="gettab(event,'installer_homeowner')">Home Owner   <img src="{{ asset('images/handshake.png') }}" alt="" width="20" height="20"> Installer</button>
+                                </li>
+
+                                <li class="nav-item">
+                                    <button type="button" id="autoclick" class="tablinks" onclick="gettab(event,'history')">History</button>
+                                </li>
                             </ul>
 
                             <div class="tab-content">
@@ -245,7 +249,7 @@
                                                     <select name="home_owners[]" id="home_owners" class="form-control" multiple>
                                                         @foreach($homeowners as $homeowner)
                                                         <option value="{{ $homeowner->uuid }}">
-                                                            {{ $homeowner->fullname}}
+                                                            {{ $homeowner->fullname}} ({{ $homeowner->phone }})
                                                         </option>
                                                         @endforeach
                                                     </select>
@@ -257,12 +261,21 @@
                                     </form>
                                     @endcan
 
-
+                                    <div>
+                                        <a href="javascript:void(0);" id="bulkdelete-btn" class="btn btn-danger">Bulk Delete</a>
+                                   </div>
                                     <table class="table mb-0 tbl-server-info" id="">
                                         <thead class="bg-white text-uppercase">
                                             <tr class="ligth ligth-data">
                                                 @can('detach-home-owner')
-                                                <th class="text-left">Action</th>
+                                                <th>
+                                                    <div class="form-check">
+                                                        <input type="checkbox" name="selectalls m-0" id="selectalls" class="form-check-input selectalls"/>
+                                                    </div>
+                                                </th>
+                                                <th class="text-left">
+                                                    Action
+                                                </th>
                                                 @endcan
                                                 <th>No</th>
                                                 <th>Home Owner</th>
@@ -271,8 +284,13 @@
                                         </thead>
                                         <tbody id="tabledata" class="ligth-body">
                                             @foreach($homeownerinstallers as $idx=>$homeownerinstaller)
-                                                <tr>
+                                                <tr id="tablerole_{{$homeownerinstaller->id}}">
                                                     @can('detach-home-owner')
+                                                    <td>
+                                                        <div class="form-check">
+                                                            <input type="checkbox" name="singlechecks" class="form-check-input singlechecks" value="{{$homeownerinstaller->id}}"/>
+                                                        </div>
+                                                   </td>
                                                     <td>
                                                         <form action="{{ route('homeownerinstallers.destroy',$homeownerinstaller->id) }}" method="POST">
                                                             @csrf
@@ -281,13 +299,58 @@
                                                         </form>
                                                     </td>
                                                     @endcan
-
                                                     <td>
                                                         {{ ++$idx }}
                                                     </td>
-
                                                     <td><a href="{{ route('homeowners.edit',$homeownerinstaller->homeowner->uuid) }}"  class="text-underline" style="text-underline-offset: 5px;">{{ $homeownerinstaller->homeowner->fullname }}</a></td>
                                                     <td>{{ $homeownerinstaller->homeowner->phone }}</td>
+                                                </tr>
+                                            @endforeach
+
+                                        </tbody>
+                                    </table>
+
+                                 </div>
+
+                                 <div id="history" class="tab-pane">
+                                    <h1>History</h1>
+
+                                    <table class="table mb-0 tbl-server-info" id="">
+                                        <thead class="bg-white text-uppercase">
+                                            <tr class="ligth ligth-data">
+                                                <th class="text-left">No</th>
+                                                <th class="text-left">Home Owners</th>
+                                                <th class="text-left">By</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tabledata" class="ligth-body">
+                                            @foreach($homeownerinstallerhistories as $idx=>$homeownerinstallerhistory)
+                                                <tr >
+
+                                                    <td class="text-left">
+                                                        {{ ++$idx }}
+                                                        {{ $idx === 1 ? "(Current)" : "" }}
+                                                    </td>
+                                                    <td class="text-left">
+                                                        {{-- @foreach($homeownerinstallerhistory->homeowners() as $homeowner)
+                                                            <a href="{{ route('homeowners.edit',$homeowner->uuid) }}" class="mx-1">{{$homeowner->fullname}} ({{ $homeowner->phone }})</a>,
+                                                        @endforeach --}}
+
+                                                        @php
+                                                            $homeownernamelinks = $homeownerinstallerhistory->homeowners()->map(function($homeowner) {
+                                                                return '<a href="' . route('homeowners.edit', $homeowner->uuid) . '" class="">' .
+                                                                    $homeowner->fullname . ' (' . $homeowner->phone . ')</a>';
+                                                            });
+
+                                                            // dd($homeownernamelinks);
+
+                                                        @endphp
+                                                               {!! $homeownernamelinks->join(' / ') !!}
+
+                                                    </td>
+                                                    <td class="text-left">
+                                                        {{$homeownerinstallerhistory->user->name}}
+                                                    </td>
                                                 </tr>
                                             @endforeach
 
@@ -555,5 +618,67 @@
    // End Tag Box
 
 
+   // Start Bulk Delete
+    $("#selectalls").click(function(){
+            $(".singlechecks").prop("checked",$(this).prop("checked"));
+    });
+
+    $("#bulkdelete-btn").click(function(){
+            let getselectedids = [];
+
+            console.log($("input:checkbox[name=singlechecks]:checked"));
+            $("input:checkbox[name='singlechecks']:checked").each(function(){
+                getselectedids.push($(this).val());
+            });
+
+
+            // console.log(getselectedids); // (4) ['1', '2', '3', '4']
+
+
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: `You won't be able to revert!`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // data remove
+                    $.ajax({
+                        url:"{{ route('homeownerinstallers.bulkdeletes') }}",
+                        type:"DELETE",
+                        dataType:"json",
+                        data:{
+                                selectedids:getselectedids,
+                                _token:"{{ csrf_token() }}"
+                        },
+                        success:function(response){
+                                console.log(response);   // 1
+
+                                if(response){
+                                    // ui remove
+                                    $.each(getselectedids,function(key,val){
+                                        $(`#tablerole_${val}`).remove();
+                                    });
+
+                                    Swal.fire({
+                                        title: "Deleted!",
+                                        text: "Your file has been deleted.",
+                                        icon: "success"
+                                    });
+                                }
+                        },
+                        error:function(response){
+                                console.log("Error: ",response)
+                        }
+                    });
+
+                }
+            });
+    });
+    // End Bulk Delete
 </script>
 @endsection

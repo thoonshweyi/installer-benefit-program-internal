@@ -7,12 +7,14 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Branch;
 use App\Jobs\SyncRowJob;
+use App\Models\HomeOwner;
 use App\Models\BranchUser;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\InstallerCard;
 use App\Models\PointPromotion;
 use App\Models\PointsRedemption;
+use App\Models\HomeownerInstaller;
 use App\Models\InstallerCardPoint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -141,8 +143,6 @@ class InstallerCardPointsController extends Controller
             $requestbranch_id = getCurrentBranch();
 
 
-
-
             // Get all active point promotions and rules
             // $activePointPromotions = PointPromotion::where('status', 1)
             //                         ->with('pointRules.pointRuleGroups')
@@ -172,9 +172,6 @@ class InstallerCardPointsController extends Controller
                 $inv_cat_grp_totals = getCategoryGroupPointTotal($requestbranch_id,$invoice_number,$activePointPromotion->pointperamount);
             }
 
-            if(empty($inv_cat_grp_totals)){
-                return redirect()->route('installercardpoints.detail',$card_number)->with("error","Invalid Invoice Voucher.");
-            }
             // dd($inv_cat_grp_totals);
             $inv_cat_grp_totals_collection = collect($inv_cat_grp_totals);
             $totalCollectedPoints =  floor($inv_cat_grp_totals_collection->sum('net_point'));
@@ -182,6 +179,20 @@ class InstallerCardPointsController extends Controller
                 return redirect()->route('installercardpoints.detail',$card_number)->with("error","This invoice number got 0 point. We do not record zero point collection.");
             }
 
+            if(empty($inv_cat_grp_totals)){
+                return redirect()->route('installercardpoints.detail',$card_number)->with("error","Invalid Invoice Voucher.");
+            }
+            // Start Home Owner Checking
+
+                // $homeowneruuids = HomeownerInstaller::where('installer_card_card_number',$card_number)->pluck('home_owner_uuid');
+                // $homeowner_gbh_customer_ids = HomeOwner::whereIn('uuid',$homeowneruuids)->pluck('gbh_customer_id');
+                // // dd($homeowner_gbh_customer_ids);
+
+                // $is_related = $inv_cat_grp_totals_collection->whereIn('gbh_customer_id',$homeowner_gbh_customer_ids)->first() ? true : false;
+                // if(!($is_related)){
+                //     return redirect()->route('installercardpoints.detail',$card_number)->with("error","Invoice is not home owners' invoice");
+                // }
+            // End Home Owner Checking
 
             foreach($inv_cat_grp_totals as $inv_cat_grp_total){
                 // dd($inv_cat_grp_total->category_name);

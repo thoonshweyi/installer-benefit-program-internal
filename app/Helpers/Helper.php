@@ -1808,6 +1808,41 @@ function getCategoryGroupPointTotal($branch_id,$invoice_number,$pointperamount){
     ");
     return $inv_cat_grp_totals;
 }
+// function getCategoryGroupPointTotalReturned($branch_id,$invoice_number,$pointperamount){
+
+//     $branch_id = getInvoiceBranch($invoice_number);
+//     // dd($branch_id);
+//     $db_ext = getConnection($branch_id);
+//     $inv_cat_grp_totals = $db_ext->select("
+//          SELECT bb.sale_cash_document_datenow::date as date,category_id,category_name,group_id,group_name,sale_cash_document_no1 as saleinvoiceno,gbh_customer_id,sale_id as sale_cash_document_id,bb.branch_code
+//             ,(sum(sale_amount))::numeric(19,2) as saleamount
+//             , voucher_value::numeric(19,2) as Coupon
+//             ,(sum(sale_amount)::integer/$pointperamount) as net_point
+//             --, case when (sum(sale_amount)::numeric(19,2))<'$pointperamount' then '0' else ((sum(sale_amount)::integer/$pointperamount))  end as net_point
+//             FROM
+//             (
+//                 SELECT aa.sale_cash_document_no as sale_cash_document_no1, aa.sale_cash_document_id as sale_id,Case when barcode_code ilike '%PRO%' then  substr(barcode_code,4, length(barcode_code) )
+//                             else barcode_code end as barcode_codes,  aa.branch_code as  branch_code,  sale_cash_document_datenow::date,gbh_customer_id, voucher_value::numeric(19,2)
+//                 ,(sale_amount)::numeric(19,2)
+
+//                 FROM sale_cash.sale_cash_document aa
+//                 LEFT JOIN sale_cash.sale_cash_items bb
+//                 on aa.sale_cash_document_id= bb.sale_cash_document_id
+//                 where aa.sale_cash_document_type_id in (1,5) and aa.sale_cash_document_status_id in ('1','5')
+//                 and  (bb.barcode_code not like 'GP%' or sale_price <='0' and diposit_type_id <> '3')
+//                 and aa.sale_cash_document_no in ('$invoice_number')
+//                 )bb
+//             LEFT JOIN temp_master_product pro on bb.barcode_codes=pro.barcode_code
+//             Left JOIN (SELECT distinct branch_code, branch_name FROM public.temp_master_product) as br on br.branch_code=bb.branch_code
+//             Left JOIN  public.diposit_type as dip on dip.diposit_type_id=pro.diposit_type_id
+//             where  sale_cash_document_no1 in ('$invoice_number')
+//             and pro.diposit_type_id in ('2','3')
+//             group by bb.sale_cash_document_datenow::date,category_id,category_name,group_id,group_name,voucher_value::numeric(19,2),sale_cash_document_no1,gbh_customer_id,sale_id,bb.branch_code
+
+//     ");
+//     return $inv_cat_grp_totals;
+// }
+
 function getCategoryGroupPointTotalReturned($branch_id,$invoice_number,$pointperamount){
 
     $branch_id = getInvoiceBranch($invoice_number);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Branch;
+use App\Jobs\SyncRowJob;
 use App\Models\BranchUser;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -166,6 +167,8 @@ class UserController extends Controller
             unset($input['branch_id']);
             $input['uuid'] = (string) Str::uuid();
             $user = User::create($input);
+            // dispatch(new SyncRowJob("users","insert",$user));
+
 
             $user_uuid = $user->uuid;
             $user_id = $user->id;
@@ -176,200 +179,6 @@ class UserController extends Controller
                 $userBranch['branch_id'] = $branch_id;
                 BranchUser::create($userBranch);
                 $input['id'] = $user->id;
-
-                // if ($branch_id == 1) {
-                //     $buser = LanthitUser::create($input);
-
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         LanthitBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $user_id;
-                //         LanthitModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 2) {
-                //     $buser = TheikPanUser::create($input);
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         TheikPanBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $user_id;
-                //         TheikPanModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 3) {
-                //     $buser = SatsanUser::create($input);
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         SatsanBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $user_id;
-                //         SatsanModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 9) {
-                //     $buser = EastDagonUser::create($input);
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         EastDagonBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $user_id;
-                //         EastDagonModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 10) {
-                //     $buser = MawlamyineUser::create($input);
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         MawlamyineBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $user_id;
-                //         MawlamyineModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 11) {
-                //     $buser = TampawadyUser::create($input);
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         TampawadyBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $user_id;
-                //         TampawadyModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 19) {
-                //     $buser = HlaingTharyarUser::create($input);
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         HlaingTharyarBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $user_id;
-                //         HlaingTharyarModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 21) {
-                //     $buser = AyeTharyarUser::create($input);
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         AyeTharyarBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $user_id;
-                //         AyeTharyarModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 27) {
-                //     $buser = TerminalMUser::create($input);
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         TerminalMBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $user_id;
-                //         TerminalMModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 28) {
-                //     $buser = SouthDagonUser::create($input);
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         SouthDagonBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $user_id;
-                //         SouthDagonModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 30) {
-                //     $buser = ShwePyiTharUser::create($input);
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         ShwePyiTharBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $user_id;
-                //         ShwePyiTharModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 23) {
-                //     $buser = BagoUser::create($input);
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         BagoBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $user_id;
-                //         BagoModelHasRole::create($userRole);
-                //     }
-                // }
             }
             $user->assignRole($request->input('roles'));
 
@@ -435,6 +244,8 @@ class UserController extends Controller
             unset($input['branch_id']);
             $user = User::find($id);
             $user->update($input);
+            // dispatch(new SyncRowJob("users","update",$user));
+
             $user_uuid = $user->uuid;
             $user_id = $user->id;
             $roles = $request->roles;
@@ -449,273 +260,6 @@ class UserController extends Controller
                 $userBranch['user_uuid'] = $user_uuid;
                 $userBranch['branch_id'] = $branch_id;
                 BranchUser::create($userBranch);
-
-                // if ($branch_id == 1) {
-                //     $buser = LanthitUser::where('uuid', $user_uuid)->first();
-                //     if($buser){
-                //         $buser->update($input);
-                //     }else{
-                //         $buser = LanthitUser::create($input);
-                //     }
-                //     LanthitModelHasRole::where('model_id', $buser->id)->delete();
-                //     LanthitBranchUser::where('user_uuid', $user_uuid)->delete();
-
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         LanthitBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $buser->id;
-                //         // LanthitModelHasRole::create($userRole);
-                //     }
-
-                // }
-
-                // if ($branch_id == 2) {
-                //     $buser = TheikPanUser::where('uuid', $user_uuid)->first();
-                //     if($buser){
-                //         $buser->update($input);
-                //     }else{
-                //         $buser = TheikPanUser::create($input);
-                //     }
-                //     TheikPanModelHasRole::where('model_id', $buser->id)->delete();
-                //     TheikPanBranchUser::where('user_uuid', $user_uuid)->delete();
-
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         TheikPanBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $buser->id;
-                //         TheikPanModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 3) {
-                //     $buser = SatsanUser::where('uuid', $user_uuid)->first();
-                //     if($buser){
-                //         $buser->update($input);
-                //     }else{
-                //         $buser = SatsanUser::create($input);
-                //     }
-                //     SatsanModelHasRole::where('model_id', $buser->id)->delete();
-                //     SatsanBranchUser::where('user_uuid', $user_uuid)->delete();
-
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         SatsanBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $buser->id;
-                //         SatsanModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 9) {
-                //     $buser = EastDagonUser::where('uuid', $user_uuid)->first();
-                //     if($buser){
-                //         $buser->update($input);
-                //     }else{
-                //         $buser = EastDagonUser::create($input);
-                //     }
-                //     EastDagonModelHasRole::where('model_id', $buser->id)->delete();
-                //     EastDagonBranchUser::where('user_uuid', $user_uuid)->delete();
-
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         EastDagonBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $buser->id;
-                //         EastDagonModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 10) {
-                //     $buser = MawlamyineUser::where('uuid', $user_uuid)->first();
-                //     if($buser){
-                //         $buser->update($input);
-                //     }else{
-                //         $buser = MawlamyineUser::create($input);
-                //     }
-                //     MawlamyineModelHasRole::where('model_id', $buser->id)->delete();
-                //     MawlamyineBranchUser::where('user_uuid', $user_uuid)->delete();
-
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         MawlamyineBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $buser->id;
-                //         MawlamyineModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 11) {
-                //     $buser = TampawadyUser::where('uuid', $user_uuid)->first();
-                //     if($buser){
-                //         $buser->update($input);
-                //     }else{
-                //         $buser = TampawadyUser::create($input);
-                //     }
-                //     TampawadyModelHasRole::where('model_id', $buser->id)->delete();
-                //     TampawadyBranchUser::where('user_uuid', $user_uuid)->delete();
-
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         TampawadyBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $buser->id;
-                //         TampawadyModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 19) {
-                //     $buser = HlaingTharyarUser::where('uuid', $user_uuid)->first();
-                //     if($buser){
-                //         $buser->update($input);
-                //     }else{
-                //         $buser = HlaingTharyarUser::create($input);
-                //     }
-                //     HlaingTharyarModelHasRole::where('model_id', $buser->id)->delete();
-                //     HlaingTharyarBranchUser::where('user_uuid', $user_uuid)->delete();
-
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         HlaingTharyarBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $buser->id;
-                //         HlaingTharyarModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 21) {
-                //     $buser = AyeTharyarUser::where('uuid', $user_uuid)->first();
-                //     if($buser){
-                //         $buser->update($input);
-                //     }else{
-                //         $buser = AyeTharyarUser::create($input);
-                //     }
-                //     AyeTharyarModelHasRole::where('model_id', $buser->id)->delete();
-                //     AyeTharyarBranchUser::where('user_uuid', $user_uuid)->delete();
-
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         AyeTharyarBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $buser->id;
-                //         AyeTharyarModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 27) {
-                //     $buser = TerminalMUser::where('uuid', $user_uuid)->first();
-                //     if($buser){
-                //         $buser->update($input);
-                //     }else{
-                //         $buser = TerminalMUser::create($input);
-                //     }
-                //     TerminalMModelHasRole::where('model_id', $buser->id)->delete();
-                //     TerminalMBranchUser::where('user_uuid', $user_uuid)->delete();
-
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         TerminalMBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $buser->id;
-                //         TerminalMModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 28) {
-                //     $buser = SouthDagonUser::where('uuid', $user_uuid)->first();
-                //     if($buser){
-                //         $buser->update($input);
-                //     }else{
-                //         $buser = SouthDagonUser::create($input);
-                //     }
-                //     SouthDagonModelHasRole::where('model_id', $buser->id)->delete();
-                //     SouthDagonBranchUser::where('user_uuid', $user_uuid)->delete();
-
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         SouthDagonBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $buser->id;
-                //         SouthDagonModelHasRole::create($userRole);
-                //     }
-                // }
-                // if ($branch_id == 30) {
-                //     $buser = ShwePyiTharUser::where('uuid', $user_uuid)->first();
-                //     if($buser){
-                //         $buser->update($input);
-                //     }else{
-                //         $buser = ShwePyiTharUser::create($input);
-                //     }
-                //     ShwePyiTharModelHasRole::where('model_id', $buser->id)->delete();
-                //     ShwePyiTharBranchUser::where('user_uuid', $user_uuid)->delete();
-
-                //     foreach ($branch_ids as $branch_id) {
-                //         $userBranch['user_uuid'] = $user_uuid;
-                //         $userBranch['branch_id'] = $branch_id;
-                //         ShwePyiTharBranchUser::create($userBranch);
-                //     }
-
-                //     foreach ($roles as $role) {
-                //         $role_id = Role::where('name', $request->roles)->first()->id;
-                //         $userRole['role_id'] = $role_id;
-                //         $userRole['model_type'] = 'App\Models\User';
-                //         $userRole['model_id'] = $buser->id;
-                //         ShwePyiTharModelHasRole::create($userRole);
-                //     }
-                // }
             }
             $user->assignRole($request->input('roles'));
 
@@ -734,22 +278,15 @@ class UserController extends Controller
         try {
             $user = User::find($id);
             if($user->roles[0]->name == "Admin" || $user->roles[0]->name == "Super Admin"){
-                // return redirect()
-                // ->intended(route("users.index"))
-                // ->with('error', 'Cannot Delete Admin!');
                 return response()->json(["error"=>"Cannot Delete Admin!"]);
             }
+            // $userId = $user->id;
             $user->delete();
-
-            // return redirect()->route('users.index')
-            //     ->with('success', 'User deleted successfully');
+            // dispatch(new SyncRowJob("users", "delete", ['id' => $userId]));
 
             return response()->json(["success"=>"User deleted successfully"]);
         } catch (\Exception$e) {
             Log::debug($e->getMessage());
-            // return redirect()
-            //     ->intended(route("users.index"))
-            //     ->with('error', 'Fail to delete User!');
 
             return response()->json(["error"=>"Fail to delete User!"]);
 

@@ -35,6 +35,7 @@ use App\Models\POS108\Pos108GbhCustomer;
 use App\Models\POS112\Pos112GbhCustomer;
 use App\Models\POS113\Pos113GbhCustomer;
 use App\Models\POS114\Pos114GbhCustomer;
+use App\Models\HomeownerInstallerHistory;
 use App\Models\InstallerCardTransferFile;
 
 class InstallerCardsController extends Controller
@@ -304,14 +305,15 @@ class InstallerCardsController extends Controller
         $installercardcount = InstallerCard::where('gbh_customer_id',$installercard->gbh_customer_id)->where('card_number',"!=",$card_number)->count();
         // dd($installercardcount);
 
-        $card_numbers = InstallerCard::where('gbh_customer_id',$installercard->gbh_customer_id)->pluck('card_number');
+        $card_numbers = InstallerCard::where('gbh_customer_id',$installercard->gbh_customer_id)->where("card_number","!=",$card_number)->pluck('card_number');
 
 
         $homeower_uuids = HomeownerInstaller::pluck('home_owner_uuid');
         $homeowners = HomeOwner::whereNotIn("uuid",$homeower_uuids)->get();
         $homeownerinstallers = HomeownerInstaller::where('installer_card_card_number',$card_number)->get();
+        $homeownerinstallerhistories = HomeownerInstallerHistory::where('installer_card_card_number',$card_number)->orderBy("id",'desc')->get();
 
-        return view("installercards.edit",compact('installercard','installercardcount','card_numbers','homeowners','homeownerinstallers'));
+        return view("installercards.edit",compact('installercard','installercardcount','card_numbers','homeowners','homeownerinstallers','homeownerinstallerhistories'));
     }
 
     public function refresh($card_number){

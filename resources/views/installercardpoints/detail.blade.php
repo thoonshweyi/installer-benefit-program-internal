@@ -170,58 +170,59 @@
                             </div>
                         </form>
 
-                        <ul class="list-group list-group-flush earningpointlists">
+                        <ul class="list-group list-group-flush transactionlists h-md-100">
 
                             @foreach ($collectiontransactions as $collectiontransaction)
-                                <li class="list-group-item {{ $collectiontransaction->checkfullyredeemed() ? 'fullyredeemed' : '' }}"  onclick="window.location.href='{{ route('collectiontransactions.show',$collectiontransaction->uuid) }}'">
-                                    <div class="row">
-                                        <div class="col">
-                                            <h6>{{ $collectiontransaction->document_no }}</h6>
-                                            <p class="pb-0 mb-0">{{ $collectiontransaction->invoice_number }}</p>
-                                            <small>{{ $collectiontransaction->collection_date }}</small>
-                                            <small class="text-danger d-block">Expire at: {{ $collectiontransaction->getExpireDate() }}</small>
-                                        </div>
-                                        <div class="col-auto text-right">
-                                            <h5 class="text-warning">+ {{$collectiontransaction->total_points_collected  }} pts</h5>
-                                            <h5 class="text-success">+ {{ number_format($collectiontransaction->total_save_value,0,'.',',') }} MMK</h5>
-                                        </div>
-                                        @can('delete-collection-transaction')
-                                            @if($collectiontransaction->isDeleteAuthUser() && $collectiontransaction->allowDelete())
-                                            <div class="col-auto align-self-center">
-                                                <form action="{{ url("/collectiontransactions/$collectiontransaction->uuid") }}" method="POST">
-                                                    @csrf
-                                                    @method('delete')
-                                                    <button type="button" class="close bg-danger delete-btns" title="Delete">
-                                                        <span class="">&times;</span>
-                                                    </button>
-                                                </form>
-
-                                            </div>
-                                            @endif
-                                        @endcan
+                            <li class="list-group-item {{ $collectiontransaction->checkfullyredeemed() ? 'fullyredeemed' : '' }}"  onclick="window.location.href='{{ route('collectiontransactions.show',$collectiontransaction->uuid) }}'">
+                                <div class="row">
+                                    <div class="col">
+                                        <h6>{{ $collectiontransaction->document_no }}</h6>
+                                        <p class="pb-0 mb-0">{{ $collectiontransaction->invoice_number }}</p>
+                                        <small>{{ $collectiontransaction->collection_date }}</small>
+                                        <small class="text-danger d-block">Expire at: {{ $collectiontransaction->getExpireDate() }}</small>
                                     </div>
-                                    {{-- {{dd($collectiontransaction->returnbanner)}} --}}
-                                    <div class="row">
-                                        <div class="col-md-12" >
-                                            @if(count($collectiontransaction->returnbanners) > 0)
-                                            <div style="border-top: 2px dashed silver">
-                                                @foreach($collectiontransaction->returnbanners as $returnbanner)
-                                                <div class="d-flex justify-content-between py-2" >
-                                                    <a href="{{ route('returnbanners.show',$returnbanner->uuid) }}" class="text-underline">{{ $returnbanner->return_product_docno  }}</a>
-                                                    <span>{{ number_format($returnbanner->total_return_value,0,'.',',') }} MMK</span>
-                                                </div>
-                                                @endforeach
-                                            </div>
-                                            @endif
+                                    <div class="col-auto text-right">
+                                        <h5 class="text-warning">+ {{$collectiontransaction->total_points_collected  }} pts</h5>
+                                        <h5 class="text-success">+ {{ number_format($collectiontransaction->total_save_value,0,'.',',') }} MMK</h5>
+                                    </div>
+                                    @can('delete-collection-transaction')
+                                        @if($collectiontransaction->isDeleteAuthUser() && $collectiontransaction->allowDelete())
+                                        <div class="col-auto align-self-center">
+                                            <form action="{{ url("/collectiontransactions/$collectiontransaction->uuid") }}" method="POST">
+                                                @csrf
+                                                @method('delete')
+                                                <button type="button" class="close bg-danger delete-btns" title="Delete">
+                                                    <span class="">&times;</span>
+                                                </button>
+                                            </form>
 
                                         </div>
+                                        @endif
+                                    @endcan
+                                </div>
+                                {{-- {{dd($collectiontransaction->returnbanner)}} --}}
+                                <div class="row">
+                                    <div class="col-md-12" >
+                                        @if(count($collectiontransaction->returnbanners) > 0)
+                                        <div style="border-top: 2px dashed silver">
+                                            @foreach($collectiontransaction->returnbanners as $returnbanner)
+                                            <div class="d-flex justify-content-between py-2" >
+                                                <a href="{{ route('returnbanners.show',$returnbanner->uuid) }}" class="text-underline">{{ $returnbanner->return_product_docno  }}</a>
+                                                <span>{{ number_format($returnbanner->total_return_value,0,'.',',') }} MMK</span>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                        @endif
+
                                     </div>
-                                </li>
+                                </div>
+                            </li>
                             @endforeach
-                            <div class="d-flex justify-content-center">
-                                {{ $collectiontransactions->appends(['redemption_page' => $redemptiontransactions->currentPage(),'collection_search' => $collectionSearch, 'redemption_search' => $redemptionSearch])->links() }}
-                            </div>
+
                         </ul>
+                        <div class="d-flex justify-content-center">
+                            {{ $collectiontransactions->appends(['redemption_page' => $redemptiontransactions->currentPage(),'collection_search' => $collectionSearch, 'redemption_search' => $redemptionSearch])->links() }}
+                        </div>
                     </div>
                   </div>
 
@@ -268,34 +269,35 @@
                             </div>
                         </form>
 
-                        <ul class="list-group list-group-flush earningpointlists">
+                        <ul class="list-group list-group-flush transactionlists">
+
                             @foreach ($redemptiontransactions as $redemptiontransaction)
-                                <li class="list-group-item"  onclick="window.location.href='{{ route('redemptiontransactions.show',$redemptiontransaction->uuid) }}'">
-                                    <div class="row">
-                                        <div class="col">
-                                            {{-- <h6>{{ $collectiontransaction->pointpromotion->name }}</h6> --}}
-                                            <p class="px-2 pb-0 mb-0 d-flex justify-content-between {{ ($redemptiontransaction->nature == 'normal') ? 'bg-success' :  (($redemptiontransaction->nature == 'return deduct') ? 'bg-danger' : ($redemptiontransaction->nature == 'double profit deduct' ? 'bg-warning' : '' )) }}">
-                                                <span>{{ $redemptiontransaction->document_no }}</span>
-                                                <span>({{ ucwords($redemptiontransaction->nature) }})</span>
-                                            </p>
-                                            {!! $redemptiontransaction->status == "pending" ? "<span class='badge bg-warning'>$redemptiontransaction->status</span>" : ($redemptiontransaction->status == "approved" ? "<span class='badge bg-success'>$redemptiontransaction->status</span>" :($redemptiontransaction->status == "rejected"? "<span class='badge bg-danger'>$redemptiontransaction->status</span>" : ($redemptiontransaction->status == "paid"? "<span class='badge bg-primary'>$redemptiontransaction->status</span>" : ($redemptiontransaction->status == "finished"? "<span class='badge bg-secondary'>$redemptiontransaction->status</span>" : '')))) !!}
-                                            <br>
-                                            <small>{{ $redemptiontransaction->redemption_date }}</small>
-                                            <small class="text-danger d-block m-0 p-0">Prepare By: {{ $redemptiontransaction->prepareby->name }}</small>
-                                            <small class="text-danger m-0 p-0">Prepare At: {{  $redemptiontransaction->created_at }}</small>
-                                            {{-- <small class="text-danger d-block">Expire at: {{ \Carbon\Carbon::parse($collectiontransaction->created_at)->endOfYear() }}</small> --}}
-                                        </div>
-                                        <div class="col-auto text-right">
-                                            <h5 class="text-warning">- {{$redemptiontransaction->total_points_redeemed  }} pts</h5>
-                                            <h5 class="text-danger">- {{ number_format($redemptiontransaction->total_cash_value,0,'.',',')  }} MMK</h5>
-                                        </div>
+                            <li class="list-group-item"  onclick="window.location.href='{{ route('redemptiontransactions.show',$redemptiontransaction->uuid) }}'">
+                                <div class="row">
+                                    <div class="col">
+                                        {{-- <h6>{{ $collectiontransaction->pointpromotion->name }}</h6> --}}
+                                        <p class="px-2 pb-0 mb-0 d-flex justify-content-between {{ ($redemptiontransaction->nature == 'normal') ? 'bg-success' :  (($redemptiontransaction->nature == 'return deduct') ? 'bg-danger' : ($redemptiontransaction->nature == 'double profit deduct' ? 'bg-warning' : '' )) }}">
+                                            <span>{{ $redemptiontransaction->document_no }}</span>
+                                            <span>({{ ucwords($redemptiontransaction->nature) }})</span>
+                                        </p>
+                                        {!! $redemptiontransaction->status == "pending" ? "<span class='badge bg-warning'>$redemptiontransaction->status</span>" : ($redemptiontransaction->status == "approved" ? "<span class='badge bg-success'>$redemptiontransaction->status</span>" :($redemptiontransaction->status == "rejected"? "<span class='badge bg-danger'>$redemptiontransaction->status</span>" : ($redemptiontransaction->status == "paid"? "<span class='badge bg-primary'>$redemptiontransaction->status</span>" : ($redemptiontransaction->status == "finished"? "<span class='badge bg-secondary'>$redemptiontransaction->status</span>" : '')))) !!}
+                                        <br>
+                                        <small>{{ $redemptiontransaction->redemption_date }}</small>
+                                        <small class="text-danger d-block m-0 p-0">Prepare By: {{ $redemptiontransaction->prepareby->name }}</small>
+                                        <small class="text-danger m-0 p-0">Prepare At: {{  $redemptiontransaction->created_at }}</small>
+                                        {{-- <small class="text-danger d-block">Expire at: {{ \Carbon\Carbon::parse($collectiontransaction->created_at)->endOfYear() }}</small> --}}
                                     </div>
-                                </li>
-                            @endforeach
-                            <div class="d-flex justify-content-center">
-                                {{ $redemptiontransactions->appends(['collection_page' => $collectiontransactions->currentPage(),'collection_search' => $collectionSearch, 'redemption_search' => $redemptionSearch])->links() }}
-                            </div>
+                                    <div class="col-auto text-right">
+                                        <h5 class="text-warning">- {{$redemptiontransaction->total_points_redeemed  }} pts</h5>
+                                        <h5 class="text-danger">- {{ number_format($redemptiontransaction->total_cash_value,0,'.',',')  }} MMK</h5>
+                                    </div>
+                                </div>
+                            </li>
+                        @endforeach
                         </ul>
+                        <div class="d-flex justify-content-center">
+                            {{ $redemptiontransactions->appends(['collection_page' => $collectiontransactions->currentPage(),'collection_search' => $collectionSearch, 'redemption_search' => $redemptionSearch])->links() }}
+                        </div>
                     </div>
                   </div>
 
@@ -305,7 +307,7 @@
 
 
                         <h4 class="mt-2">Return Deduction Records:</h4>
-                        <ul class="list-group list-group-flush earningpointlists">
+                        <ul class="list-group list-group-flush transactionlists">
                             @foreach ($redemptiontransactions as $redemptiontransaction)
                                 <li class="list-group-item"  onclick="window.location.href='{{ route('redemptiontransactions.show',$redemptiontransaction->uuid) }}'">
                                     <div class="row">
