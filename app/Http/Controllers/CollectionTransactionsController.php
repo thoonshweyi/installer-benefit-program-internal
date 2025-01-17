@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Exception;
 use Carbon\Carbon;
 use App\Jobs\SyncRowJob;
+use App\Models\PointPay;
 use App\Models\BranchUser;
 use Illuminate\Support\Str;
 use App\Models\ReturnBanner;
@@ -372,6 +373,8 @@ class CollectionTransactionsController extends Controller
             $totalDeductedPoints = 0;
             $totalMissAmount = 0;
             $totalReturnPriceAmount = $total_return_price_amount;
+            $preusedpoints = 0;
+            $preusedamount = 0;
             foreach($ret_cat_grp_totals as $item){
                 $category_id = $item->category_id;
                 $category_name = $item->category_name;
@@ -411,11 +414,22 @@ class CollectionTransactionsController extends Controller
                         $amount_redeemed = $installercardpoint->amount_redeemed;
                         $points_balance = $points_earned - $points_redeemed;
                         $amount_balance = $amount_earned - $amount_redeemed;
+                        // Excluding the paid points
+                        $points_paid = PointPay::where('installer_card_point_uuid',$installercardpoint->uuid)->sum('points_paid');
+                        $amount_paid = PointPay::where('installer_card_point_uuid',$installercardpoint->uuid)->sum('accept_value');
+                        $points_balance += $points_paid;
+                        $amount_balance += $amount_paid;
                         if($points_balance <= 0 && $amount_balance <= 0){
                             $is_redeemed = 1;
                         }else{
                             $is_redeemed = 0;
                         }
+
+                        $all_preused_points = $points_earned - $points_redeemed;
+                        $all_preused_amount = $amount_earned - $amount_redeemed;
+                        // Get this time preused points
+                        $preusedpoints += $points_balance < 0 ? ($all_preused_points - $installercardpoint->preused_points) : 0;
+                        $preusedamount += $amount_balance < 0 ? ($all_preused_amount - $installercardpoint->preused_amount) : 0;
                         $updatearr =  [
                             'id'=>$installercardpoint->id,
                             // 'uuid' => (string) Str::uuid(),
@@ -434,8 +448,8 @@ class CollectionTransactionsController extends Controller
                             'amount_earned'=> $amount_earned,
                             'amount_redeemed'=> $amount_redeemed,
                             'amount_balance'=>$amount_balance ,
-                            'preused_points'=> $points_balance < 0 ? $points_balance : 0,
-                            'preused_amount'=> $amount_balance < 0 ? $amount_balance : 0,
+                            'preused_points'=> $all_preused_points < 0 ? $all_preused_points : 0,
+                            'preused_amount'=> $all_preused_amount < 0 ? $all_preused_amount : 0,
                             // 'expiry_date'=> Carbon::now()->endOfYear(),
                             'is_redeemed'=> $is_redeemed,
                             'is_returned'=> 1,
@@ -447,21 +461,12 @@ class CollectionTransactionsController extends Controller
 
                         $totalDeductedPoints += abs($item->return_point);
                         $totalMissAmount += $miss_amount;
+
+
                     }
                 }
             }
 
-
-            $preusedpoints = InstallerCardPoint::where("collection_transaction_uuid",$collectiontransaction->uuid)
-                                ->where('points_balance',"<",0)
-                                ->orderBy("created_at", "asc")
-                                ->orderBy('id','asc')
-                                ->sum('points_balance');
-            $preusedamount =InstallerCardPoint::where("collection_transaction_uuid",$collectiontransaction->uuid)
-                            ->where('points_balance',"<",0)
-                            ->orderBy("created_at", "asc")
-                            ->orderBy('id','asc')
-                            ->sum('amount_balance');
 
             $collectiontransaction->update([
                 "total_sale_cash_amount"=>$collectiontransaction->total_sale_cash_amount - $totalReturnPriceAmount,
