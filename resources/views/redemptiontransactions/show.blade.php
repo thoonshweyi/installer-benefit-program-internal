@@ -311,7 +311,7 @@
             @if($redemptiontransaction->doubleprofitslip)
             <div class="col-lg-12 mb-4 pb-4">
                 <div class="table-responsive rounded">
-                    <h5>Preused Slip</h5>
+                    <h5>Double Profit Slip</h5>
                     <table class="table table-primary mb-0 tbl-server-info" id="lucky_draw_list">
                         <thead class="bg-white text-uppercase">
                             <tr class="ligth ligth-data">
