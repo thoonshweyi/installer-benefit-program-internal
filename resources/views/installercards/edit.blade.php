@@ -46,11 +46,33 @@
                                 <li class="nav-item">
                                     <button type="button" id="autoclick" class="tablinks" onclick="gettab(event,'history')">History</button>
                                 </li>
+
                             </ul>
 
                             <div class="tab-content">
 
                                  <div id="content" class="tab-pane">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <h4 class="mb-3 text-center text-primary">{{ $installercard->card_number }}
+                                                {!! $installercard->stage == "pending" ?
+                                                "<span class='badge bg-warning'>$installercard->stage</span>" :
+                                                ($installercard->stage == "approved" ? "<span class='badge bg-success'>$installercard->stage</span>" :
+                                                ($installercard->stage == "rejected"? "<span class='badge bg-danger'>$installercard->stage</span>" :
+                                                ($installercard->stage == "exported"? "<span class='badge bg-secondary'>$installercard->stage</span>" : ""
+                                                ))) !!}
+                                            </h4>
+                                            <div class="d-flex justify-content-between font-weight-bold">
+                                                <div class="d-flex flex-column">
+                                                    <span>Branch - {{ $installercard->branch->branch_name_eng }}</span>
+                                                    <span>Date: {{  \Carbon\Carbon::parse($installercard->created_at)->format('d-m-Y h:m:s A') }}</span>
+                                                    {{-- <span>Installer Name - {{ $collectiontransaction->installercard->fullname }}</span> --}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
                                     <form action="{{ route('installercards.refresh',$installercard->card_number) }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         @method('PATCH')
@@ -58,8 +80,8 @@
                                             <div class="row">
                                                 <div class="col-md-3">
                                                     <div class="form-group poscustomer {{ $installercard->ismembercustomer() ? 'member' : '' }}">
-                                                        <label for="fullname">Full Name<span class="cancel_status">*</sapn> </label>
-                                                        <input type="text" name="fullname" id="fullname" class="form-control" value="{{old('fullname',$installercard->fullname)}}" placeholder="Full Name" readonly/>
+                                                        <label for="edit_fullname">Full Name<span class="cancel_status">*</sapn> </label>
+                                                        <input type="text" name="edit_fullname" id="edit_fullname" class="form-control" value="{{old('fullname',$installercard->fullname)}}" placeholder="Full Name" readonly/>
                                                         <div class="crownicon">
                                                             <img src="{{ asset('./images/crown.png') }}" alt="crownicon" width="44" height="44">
                                                         </div>
@@ -67,15 +89,15 @@
                                                 </div>
                                                 <div class="col-md-3">
                                                     <div class="form-group">
-                                                        <label for="phone">Phone<span class="cancel_status">*</sapn> </label>
-                                                        <input type="text" name="phone" id="phone"  class="form-control phone" value="{{old('phone',$installercard->phone)}}" placeholder="Mobile" readonly />
+                                                        <label for="edit_phone">Phone<span class="cancel_status">*</sapn> </label>
+                                                        <input type="text" name="edit_phone" id="edit_phone"  class="form-control phone" value="{{old('phone',$installercard->phone)}}" placeholder="Mobile" readonly />
                                                     </div>
                                                 </div>
 
                                                 <div class="col-md-3">
                                                     <div class="form-group">
-                                                        <label for="address">Address<span class="cancel_status">*</sapn> </label>
-                                                        <input type="text" name="address" id="address"  class="form-control phone" value="{{old('address',$installercard->address)}}" placeholder="Division Townshsip" readonly />
+                                                        <label for="edit_address">Address<span class="cancel_status">*</sapn> </label>
+                                                        <input type="text" name="edit_address" id="edit_address"  class="form-control phone" value="{{old('address',$installercard->address)}}" placeholder="Division Townshsip" readonly />
                                                     </div>
                                                 </div>
 
@@ -111,16 +133,16 @@
 
                                                 <div class="col-md-3">
                                                     <div class="form-group">
-                                                        <label for="gender">Gender<span class="cancel_status">*</sapn> </label>
-                                                        <input type="text" name="gender" id="gender"  class="form-control customer_barcode" value="{{old('gender',$installercard->gender)}}" placeholder="Gender" readonly />
+                                                        <label for="edit_gender">Gender<span class="cancel_status">*</sapn> </label>
+                                                        <input type="text" name="edit_gender" id="edit_gender"  class="form-control customer_barcode" value="{{old('gender',$installercard->gender)}}" placeholder="Gender" readonly />
                                                     </div>
                                                 </div>
 
 
                                                 <div class="col-md-3">
                                                     <div class="form-group">
-                                                        <label for="dob">Birthday<span class="cancel_status">*</sapn> </label>
-                                                        <input type="date" name="dob" id="dob"  class="form-control customer_barcode" value="{{old('dob',$installercard->dob)}}" readonly />
+                                                        <label for="edit_dob">Birthday<span class="cancel_status">*</sapn> </label>
+                                                        <input type="date" name="edit_dob" id="edit_dob"  class="form-control customer_barcode" value="{{old('dob',$installercard->dob)}}" readonly />
                                                     </div>
                                                 </div>
 
@@ -128,46 +150,46 @@
 
                                                 <div class="col-md-3">
                                                     <div class="form-group">
-                                                        <label for="nrc">NRC<span class="cancel_status">*</sapn> </label>
-                                                        <input type="text" name="nrc" id="nrc"  class="form-control nrc" value="{{old('nrc',$installercard->nrc)}}" placeholder="National Registration Card" readonly />
+                                                        <label for="edit_nrc">NRC<span class="cancel_status">*</sapn> </label>
+                                                        <input type="text" name="edit_nrc" id="edit_nrc"  class="form-control nrc" value="{{old('nrc',$installercard->nrc)}}" placeholder="National Registration Card" readonly />
                                                     </div>
                                                 </div>
 
 
                                                 <div class="col-md-3">
                                                     <div class="form-group">
-                                                        <label for="passport">Passport</label>
-                                                        <input type="text" name="passport" id="passport"  class="form-control passport" value="{{old('passport',$installercard->passport)}}" placeholder="Passport" readonly />
+                                                        <label for="edit_passport">Passport</label>
+                                                        <input type="text" name="edit_passport" id="edit_passport"  class="form-control passport" value="{{old('passport',$installercard->passport)}}" placeholder="Passport" readonly />
                                                     </div>
                                                 </div>
 
                                                 <div class="col-md-3">
                                                     <div class="form-group">
-                                                        <label for="identification_card">Member Card.No</label>
-                                                        <input type="text" name="identification_card" id="identification_card"  class="form-control identification_card" value="{{old('identification_card',$installercard->identification_card)}}" placeholder="xxxxxxxxxx" readonly />
+                                                        <label for="edit_identification_card">Member Card.No</label>
+                                                        <input type="text" name="edit_identification_card" id="edit_identification_card"  class="form-control identification_card" value="{{old('identification_card',$installercard->identification_card)}}" placeholder="xxxxxxxxxx" readonly />
                                                     </div>
                                                 </div>
-                                                <input type="hidden" id="member_active" name="member_active" value="{{ old('member_active',$installercard->member_active) }}"/>
-                                                <input type="hidden" id="customer_active" name="customer_active" value="{{ old('customer_active',$installercard->customer_active) }}"/>
-                                                <input type="hidden" id="customer_rank_id" name="customer_rank_id" value="{{ old('customer_rank_id',$installercard->customer_rank_id) }}"/>
+                                                <input type="hidden" id="edit_member_active" name="edit_member_active" value="{{ old('member_active',$installercard->member_active) }}"/>
+                                                <input type="hidden" id="edit_customer_active" name="edit_customer_active" value="{{ old('customer_active',$installercard->customer_active) }}"/>
+                                                <input type="hidden" id="edit_customer_rank_id" name="edit_customer_rank_id" value="{{ old('customer_rank_id',$installercard->customer_rank_id) }}"/>
 
                                                 <div class="col-md-3">
                                                     <div class="form-group">
-                                                        <label for="customer_barcode">Customer Bar Code<span class="cancel_status">*</sapn> </label>
-                                                        <input type="text" name="customer_barcode" id="customer_barcode"  class="form-control customer_barcode" value="{{old('customer_barcode',$installercard->customer_barcode)}}" placeholder="Customer Bar Code" readonly />
+                                                        <label for="edit_customer_barcode">Customer Bar Code<span class="cancel_status">*</sapn> </label>
+                                                        <input type="text" name="edit_customer_barcode" id="edit_customer_barcode"  class="form-control customer_barcode" value="{{old('customer_barcode',$installercard->customer_barcode)}}" placeholder="Customer Bar Code" readonly />
                                                     </div>
                                                 </div>
 
-                                                <input type="hidden" id="titlename" name="titlename" value="{{ old('titlename') }}"/>
-                                                <input type="hidden" id="firstname" name="firstname" value="{{ old('firstname') }}"/>
-                                                <input type="hidden" id="lastname" name="lastname" value="{{ old('lastname') }}"/>
-                                                <input type="hidden" id="province_id" name="province_id" value="{{ old('province_id') }}"/>
-                                                <input type="hidden" id="amphur_id" name="amphur_id" value="{{ old('amphur_id') }}"/>
-                                                <input type="hidden" id="nrc_no" name="nrc_no" value="{{ old('nrc_no') }}"/>
-                                                <input type="hidden" id="nrc_name" name="nrc_name" value="{{ old('nrc_name') }}"/>
-                                                <input type="hidden" id="nrc_short" name="nrc_short" value="{{ old('nrc_short') }}"/>
-                                                <input type="hidden" id="nrc_number" name="nrc_number" value="{{ old('nrc_number') }}"/>
-                                                <input type="hidden" id="gbh_customer_id" name="gbh_customer_id" value="{{ old('gbh_customer_id') }}"/>
+                                                <input type="hidden" id="edit_titlename" name="edit_titlename" value="{{ old('titlename') }}"/>
+                                                <input type="hidden" id="edit_firstname" name="edit_firstname" value="{{ old('firstname') }}"/>
+                                                <input type="hidden" id="edit_lastname" name="edit_lastname" value="{{ old('lastname') }}"/>
+                                                <input type="hidden" id="edit_province_id" name="edit_province_id" value="{{ old('province_id') }}"/>
+                                                <input type="hidden" id="edit_amphur_id" name="edit_amphur_id" value="{{ old('amphur_id') }}"/>
+                                                <input type="hidden" id="edit_nrc_no" name="edit_nrc_no" value="{{ old('nrc_no') }}"/>
+                                                <input type="hidden" id="edit_nrc_name" name="edit_nrc_name" value="{{ old('nrc_name') }}"/>
+                                                <input type="hidden" id="edit_nrc_short" name="edit_nrc_short" value="{{ old('nrc_short') }}"/>
+                                                <input type="hidden" id="edit_nrc_number" name="edit_nrc_number" value="{{ old('nrc_number') }}"/>
+                                                <input type="hidden" id="edit_gbh_customer_id" name="edit_gbh_customer_id" value="{{ old('gbh_customer_id') }}"/>
 
                                                 <div class="col-md-12">
                                                     <label for="">Installer Background Files</label>
@@ -234,6 +256,73 @@
                                                 </div></br>
                                             </div>
                                     </form>
+
+
+                                    @if($installercard->isApproveAuthUser() && $installercard->stage == 'pending')
+
+                                    <div class="col-lg-12 mb-2">
+                                        <form id="bm-form" action="" method="POST" enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="row align-items-end">
+                                                <div class="col-md-4">
+                                                    <div class="form-group m-0">
+                                                        <label for="remark" class="m-0">Remark</label>
+                                                        <textarea name="remark" id="remark" class="form-control w-100" rows="2" placeholder="Write Something...."></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto p-0">
+                                                    <button  type="button" id="bm-approve"class="btn btn-primary mr-2">Approve</button>
+                                                </div>
+                                                <div class="col-auto p-0">
+                                                    <button type="button" id="bm-reject" class="btn btn-danger mr-2">Reject</button>
+                                                </div>
+                                                <div class="col-auto p-0">
+                                                    <button type="button" id="back-btn" class="btn btn-light" onclick="window.history.back();">Back</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    @endif
+
+                                    <div class="row my-2">
+                                        <div class="col-md-3 mb-4 mb-md-0 transactionfooters">
+                                            <p class="mb-1">Prepare By</p>
+                                            <span>{{ $installercard->user->name }}</span>
+                                            {!!
+
+                                                "( ".implode(",", array_map(function($role){
+                                                    return "<span class='roles'>$role</span>";
+                                                    },$installercard->user->getRoleNames()->toArray())
+                                                )." )"
+
+                                            !!}
+                                            <span>{{ $installercard->issued_at }}</span>
+
+                                        </div>
+
+                                        <div class="col-md-3 mb-4 mb-md-0 transactionfooters">
+                                            <p class="mb-1">Approved By</p>
+                                            <span class="{{ $installercard->approvedby ? '' : 'text-muted font-weight-normal' }}">{{ $installercard->approvedby ? $installercard->approvedby->name : 'N/A' }}</span>
+                                            @if($installercard->approvedby)
+                                            {!!
+
+                                                "( ".implode(",", array_map(function($role){
+                                                    return "<span class='roles'>$role</span>";
+                                                    },$installercard->approvedby->getRoleNames()->toArray())
+                                                )." )"
+
+                                            !!}
+                                            @else
+                                                    {!! "<span class='text-muted font-weight-normal roles'>(Branch Manager)</span>" !!}
+                                            @endif
+                                            <div class="d-flex flex-wrap ">
+                                                <span class="font-weight-bold text-info">"</span> <span class="mx-1 text-info">{{  $installercard->bm_remark }}</span> <span class="font-weight-bold text-info">"</span>
+
+                                            </div>
+                                            <span class="{{ $installercard->approved_date ? '' : 'text-muted font-weight-normal' }}">{{  $installercard->approved_date ? $installercard->approved_date : 'MM-DD-YYYY' }}</span>
+                                        </div>
+                                    </div>
+
                                  </div>
 
 
@@ -241,7 +330,7 @@
                                     @can('attach-home-owner')
                                     <form action="{{ route('homeownerinstallers.store') }}" method="POST">
                                         @csrf
-                                        <div class="row">
+                                        <div class="row align-items-end">
                                             <div class="col-md-3">
                                                 <input type="hidden" name="card_number" id="card_number" class="card_number" value="{{ $installercard->card_number }}"/>
                                                 <div class="form-group">
@@ -254,9 +343,14 @@
                                                         @endforeach
                                                     </select>
                                                 </div>
-                                                <button type="submit" class="btn btn-primary my-1">Add</button>
-
                                             </div>
+                                            <div class="col-auto">
+                                                <button type="button" id="" class="btn btn-primary mb-2 text-center d-flex justify-content-center align-items-center" data-toggle="modal" data-target="#addhomeownermodal"><i class="fas fa-plus"></i></button>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <button type="submit" class="btn btn-primary my-1">Add</button>
+                                            </div>
+
                                         </div>
                                     </form>
                                     @endcan
@@ -321,6 +415,7 @@
                                                 <th class="text-left">No</th>
                                                 <th class="text-left">Home Owners</th>
                                                 <th class="text-left">By</th>
+                                                <th class="text-left">Date Time</th>
                                             </tr>
                                         </thead>
                                         <tbody id="tabledata" class="ligth-body">
@@ -351,6 +446,9 @@
                                                     <td class="text-left">
                                                         {{$homeownerinstallerhistory->user->name}}
                                                     </td>
+                                                    <td class="text-left">
+                                                        {{  \Carbon\Carbon::parse($homeownerinstallerhistory->created_at)->format('d-m-Y h:m:s A') }}
+                                                    </td>
                                                 </tr>
                                             @endforeach
 
@@ -380,6 +478,189 @@
 <div class="modal fade show_image" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content" id="show_image_div">
+        </div>
+    </div>
+</div>
+
+<div id="addhomeownermodal" class="modal fade">
+    <div class="modal-dialog modal-xl modal-dialog-top modal-dialog-fullscreen">
+        <div class="modal-content rounded-0">
+            <div class="modal-header">
+                <h6 class="modal-title">Add Home Owner Modal</h6>
+                <button type="" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="card-body">
+
+
+                    <div class="col-md-12 my-4">
+                        {{-- <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">10%</div>
+                          </div> --}}
+
+                        <div class="position-relative" style="top:-5px">
+                            <span class="register-steps" style="position: absolute;left: 50%;transform:translateX(-50%)">1</span>
+                            <span class="register-steps" style="position: absolute;left: 100%;transform:translateX(-50%)">2</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 20px">
+                            <div id="register-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+
+                    <h1 class="text-primary">Setp 1: Verify Phone Number</h1>
+                    <form id="verify-form" action="" method="">
+                        <div class="row align-items-center">
+                            <div class="col-md-3 form-group mb-3">
+                                <label for="ver_phone">Customer Phone Number<span class="text-danger">*</span></label>
+                                <input type="text" name="ver_phone" id="ver_phone" class="form-control rounded-0" value="{{ old('hide_ver_phone') }}" placeholder="09xxxxxxxxx"/>
+                            </div>
+
+                            <div class="col-auto">
+                                <button type="button" id="verify-btn" class="btn btn-primary px-3 py-1">Verify</button>
+                            </div>
+
+                            {{-- <div class="col-auto text-end">
+                                <button type="button" id="verify-btn" class="btn btn-primary btn-sm px-3 py-1" >Verify</button>
+                            </div> --}}
+                        </div>
+                    </form>
+                    <form id="register-installer-card-form"  action="{{ route('homeowners.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                            {{-- <h5>Automatic Fields:</h5> --}}
+                            <h1 class="text-primary">Setp 2: Check Home Owner Information</h1>
+                            <input type="hidden" id="hide_ver_phone" name="hide_ver_phone" value="{{old('hide_ver_phone')}}"/>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group poscustomer {{ (old('identification_card') != null && old('member_active') && old('customer_active') && old('customer_rank_id') == 1013) ? 'member' : '' }}">
+                                        <label for="fullname">Full Name<span class="cancel_status">*</sapn> </label>
+                                        <input type="text" name="fullname" id="fullname" class="form-control" value="{{ old('fullname') }}" placeholder="Full Name" readonly/>
+
+                                        <div class="crownicon">
+                                            <img src="{{ asset('./images/crown.png') }}" alt="crownicon" width="44" height="44">
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="phone">Phone<span class="cancel_status">*</sapn> </label>
+                                        <input type="text" name="phone" id="phone"  class="form-control phone" value="{{ old('phone') }}" placeholder="Mobile" readonly />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="address">Address<span class="cancel_status">*</sapn> </label>
+                                        <input type="text" name="address" id="address"  class="form-control phone" value="{{ old('address') }}" placeholder="Division Townshsip" readonly />
+                                    </div>
+                                </div>
+
+
+                                {{-- <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="mr-2">State / Division<span class="cancel_status">*</sapn> </label>
+                                        <select name="province_id" id="province_id" class="form-control readonly-select">
+                                            <option value="" selected disabled>Choose a state / division name</option>
+                                            @foreach($provinces as $province)
+                                            <option value="{{ $province->province_id }}">
+                                                {{ $province->province_name}}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="mr-2">Township<span class="cancel_status">*</sapn> </label>
+                                        <select name="amphur_id" id="amphur_id" class="form-control readonly-select">
+                                            <option value="" selected disabled>Choose a township</option>
+                                            @foreach($provinces as $province)
+                                            <option value="{{ $province->province_id }}">
+                                                {{ $province->province_name}}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div> --}}
+
+
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="gender">Gender<span class="cancel_status">*</sapn> </label>
+                                        <input type="text" name="gender" id="gender"  class="form-control customer_barcode" value="{{ old('gender') }}" placeholder="Gender" readonly />
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="dob">Birthday<span class="cancel_status">*</sapn> </label>
+                                        <input type="date" name="dob" id="dob"  class="form-control customer_barcode" value="{{ old('dob') }}" readonly />
+                                    </div>
+                                </div>
+
+
+
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="nrc">NRC<span class="cancel_status">*</sapn> </label>
+                                        <input type="text" name="nrc" id="nrc"  class="form-control nrc" value="{{ old('nrc') }}" placeholder="National Registration Card" readonly />
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="passport">Passport</label>
+                                        <input type="text" name="passport" id="passport"  class="form-control passport" value="{{ old('passport') }}" placeholder="Passport" readonly />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="identification_card">Member Card.No</label>
+                                        <input type="text" name="identification_card" id="identification_card"  class="form-control identification_card" value="{{ old('identification_card') }}" placeholder="xxxxxxxxxx" readonly />
+                                    </div>
+                                </div>
+                                <input type="hidden" id="member_active" name="member_active" value="{{ old('member_active') }}"/>
+                                <input type="hidden" id="customer_active" name="customer_active" value="{{ old('customer_active') }}"/>
+                                <input type="hidden" id="customer_rank_id" name="customer_rank_id" value="{{ old('customer_rank_id') }}"/>
+
+
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="customer_barcode">Customer Bar Code<span class="cancel_status">*</sapn> </label>
+                                        <input type="text" name="customer_barcode" id="customer_barcode"  class="form-control customer_barcode" value="{{ old('customer_barcode') }}" placeholder="Customer Bar Code" readonly />
+                                    </div>
+                                </div>
+
+                                <input type="hidden" id="titlename" name="titlename" value="{{ old('titlename') }}"/>
+                                <input type="hidden" id="firstname" name="firstname" value="{{ old('firstname') }}"/>
+                                <input type="hidden" id="lastname" name="lastname" value="{{ old('lastname') }}"/>
+                                <input type="hidden" id="province_id" name="province_id" value="{{ old('province_id') }}"/>
+                                <input type="hidden" id="amphur_id" name="amphur_id" value="{{ old('amphur_id') }}"/>
+                                <input type="hidden" id="nrc_no" name="nrc_no" value="{{ old('nrc_no') }}"/>
+                                <input type="hidden" id="nrc_name" name="nrc_name" value="{{ old('nrc_name') }}"/>
+                                <input type="hidden" id="nrc_short" name="nrc_short" value="{{ old('nrc_short') }}"/>
+                                <input type="hidden" id="nrc_number" name="nrc_number" value="{{ old('nrc_number') }}"/>
+                                <input type="hidden" id="gbh_customer_id" name="gbh_customer_id" value="{{ old('gbh_customer_id') }}"/>
+                            </div>
+
+
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button type="button" id="back-btn" class="btn btn-warning mr-2" onclick="window.history.back();">Back</button>
+                                    <button type="submit" class="btn btn-primary" id="">Save</button>
+                                </div></br>
+                            </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+            </div>
         </div>
     </div>
 </div>
@@ -478,30 +759,24 @@
 @section('js')
 <script type="text/javascript">
     $(document).ready(function(){
-        $('.delete-btns').click(function(e){
-            {{-- console.log('hi'); --}}
-            e.preventDefault();
 
-            Swal.fire({
-                title: "Are you sure you want to remove an installer card?",
-                text: "Installer Card will be permanently deleted.",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, delete it!"
-              }).then((result) => {
-                if (result.isConfirmed) {
-                    {{-- console.log($(this).closest('form')); --}}
-                    $(this).closest('form').submit();
-                }
-              });
-
-        });
     });
 
-    $('#ver_phone').blur(function(){
+    $('#verify-btn').click(verifyinstaller);
+
+    $('#verify-form').submit(function(e){
+        e.preventDefault();
+        verifyinstaller();
+    });
+
+    function verifyinstaller(){
+        $("#register-installer-card-form")[0].reset();
+
         const verifyphone = $("#ver_phone").val();
+
+        currentpercent = 1/4 * 100
+        $('.progress-bar').css('width', `${currentpercent}%`);
+        {{-- $('#register-progress-bar').text(`${currentpercent.toFixed(2)}%`); --}}
 
         $.ajax({
             url:"{{ route('installercards.verifycustomer') }}",
@@ -522,6 +797,9 @@
                     $('#nrc').val(response.customer.nrc_array_id);
                     $('#passport').val(response.customer.passport);
                     $('#identification_card').val(response.customer.identification_card);
+                    $('#member_active').val(response.customer.member_active);
+                    $('#customer_active').val(response.customer.customer_active);
+                    $('#customer_rank_id').val(response.customer.customer_rank_id);
                     $('#customer_barcode').val(response.customer.customer_barcode);
 
 
@@ -535,6 +813,18 @@
                     $('#nrc_short').val(response.customer.nrc_short);
                     $('#nrc_number').val(response.customer.nrc_number);
                     $("#gbh_customer_id").val(response.customer.gbh_customer_id)
+
+                    $('#card_number').focus();
+
+                    currentpercent = 2/4 * 100
+                    $('.progress-bar').css('width', `${currentpercent}%`)
+
+                    if(response.ismembercustomer){
+                        $('.poscustomer').addClass('member');
+                    }else{
+                        $('.poscustomer').removeClass('member');
+
+                    }
                 }else{
                     {{-- console.log("No, Customer Found"); --}}
                     Swal.fire({
@@ -555,8 +845,7 @@
                 });
             }
         });
-    });
-
+    }
 
     $('.redemptiontransactionimages').click(function(){
         var src = $(this).attr("src");
@@ -680,5 +969,38 @@
             });
     });
     // End Bulk Delete
+
+
+
+    $('#bm-reject').click(function(e){
+        {{-- console.log('hi'); --}}
+        e.preventDefault();
+
+        Swal.fire({
+            title: "Are you sure you want to reject redemption request?",
+            text: "Redemption Transacation will be rejected",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, reject it!"
+          }).then((result) => {
+            if (result.isConfirmed) {
+                $('#bm-form').attr('action',"{{ route('installercards.rejectCardRequest', ['cardnumber' => $installercard->card_number]) }}");
+                $('#bm-form').submit();
+            }
+          });
+
+    });
+
+
+    $('#bm-approve').click(function(e){
+        {{-- console.log('hi'); --}}
+        e.preventDefault();
+
+        $('#bm-form').attr('action',"{{ route('installercards.approveCardRequest',$installercard->card_number) }}");
+        $('#bm-form').submit();
+
+    });
 </script>
 @endsection

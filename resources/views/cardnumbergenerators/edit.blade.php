@@ -42,13 +42,13 @@
                                         "<span class='badge bg-warning'>$cardnumbergenerator->status</span>" :
                                         ($cardnumbergenerator->status == "approved" ? "<span class='badge bg-success'>$cardnumbergenerator->status</span>" :
                                         ($cardnumbergenerator->status == "rejected"? "<span class='badge bg-danger'>$cardnumbergenerator->status</span>" :
-                                        ($cardnumbergenerator->status == "exported"? "<span class='badge bg-secondary'>$cardnumbergenerator->status</span>" : ""
+                                        ($cardnumbergenerator->status == "exported"? "<span class='badge bg-primary'>$cardnumbergenerator->status</span>" : ""
                                         ))) !!}
                                     </h4>
                                     <div class="d-flex justify-content-between font-weight-bold">
                                         <div class="d-flex flex-column">
                                             <span>Branch - {{ $cardnumbergenerator->branch->branch_name_eng }}</span>
-                                            <span>Date: {{  \Carbon\Carbon::parse($cardnumbergenerator->created_at)->format('d-m-Y') }}</span>
+                                            <span>Date: {{  \Carbon\Carbon::parse($cardnumbergenerator->created_at)->format('d-m-Y h:m:s A') }}</span>
                                             {{-- <span>Installer Name - {{ $collectiontransaction->installercard->fullname }}</span> --}}
                                         </div>
                                     </div>

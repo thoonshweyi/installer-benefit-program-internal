@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class InstallerCard extends Model
 {
     use HasFactory;
@@ -56,8 +58,12 @@ class InstallerCard extends Model
         'stage'
     ];
 
-    public function users(){
+    public function user(){
         return $this->belongsTo(User::class,"user_uuid","uuid");
+    }
+
+    public function approvedby(){
+        return $this->belongsTo(User::class,"approved_by","uuid");
     }
 
     public function branch(){
@@ -100,6 +106,26 @@ class InstallerCard extends Model
 
     public function homeowners(){
         return $this->belongsToMany(HomeOwner::class,"homeowner_installers","installer_card_card_number","home_owner_uuid","card_number","uuid");
+    }
+
+    public function isApproveAuthUser(){
+
+        $user = Auth::user();
+
+        // dd($user->roles);
+        // Check if the user's branch matches the transaction's branch
+        $belongsToBranch = BranchUser::where('user_uuid', $user->uuid)
+                            ->where('branch_id', $this->branch_id)
+                            ->exists();
+
+        // Check if the user has the Branch Manager role
+        $isBranchManager = $user->roles()->where('name', 'Branch Manager')->exists();
+         // Return true if both conditions are met
+         return $belongsToBranch && $isBranchManager;
+
+        //  Method 2
+        // *firstly find Aughorized user
+        // *compare with current user
     }
 
 }

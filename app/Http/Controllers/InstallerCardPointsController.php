@@ -35,7 +35,9 @@ class InstallerCardPointsController extends Controller
 
         $installercard = InstallerCard::where('card_number',$cardnumber)->first();
         // dd($installercard);
-        $installercardcount = InstallerCard::where('gbh_customer_id',$installercard->gbh_customer_id)->where('card_number',"!=",$cardnumber)->count();
+        $installercardcount = InstallerCard::where('customer_barcode',$installercard->customer_barcode)
+                            ->whereIn("stage",["approved"])
+                            ->where('card_number',"!=",$card_number)->count();
         // dd($installercardcount);
 
         $user = Auth::user();
@@ -182,17 +184,34 @@ class InstallerCardPointsController extends Controller
             if(empty($inv_cat_grp_totals)){
                 return redirect()->route('installercardpoints.detail',$card_number)->with("error","Invalid Invoice Voucher.");
             }
+
             // Start Home Owner Checking
+                $homeowneruuids = HomeownerInstaller::where('installer_card_card_number',$card_number)->pluck('home_owner_uuid');
+                $homeowner_gbh_customer_ids = HomeOwner::whereIn('uuid',$homeowneruuids)->pluck('gbh_customer_id');
+                // dd($homeowner_gbh_customer_ids);
 
-                // $homeowneruuids = HomeownerInstaller::where('installer_card_card_number',$card_number)->pluck('home_owner_uuid');
-                // $homeowner_gbh_customer_ids = HomeOwner::whereIn('uuid',$homeowneruuids)->pluck('gbh_customer_id');
-                // // dd($homeowner_gbh_customer_ids);
+                $installercard_gbh_customer_id = $installercard->gbh_customer_id;
+                $is_related = $inv_cat_grp_totals_collection->filter(function ($item) use ($homeowner_gbh_customer_ids, $installercard_gbh_customer_id) {
+                    return in_array($item->gbh_customer_id, $homeowner_gbh_customer_ids->toArray()) || $item->gbh_customer_id == $installercard_gbh_customer_id;
+                })->first();
 
-                // $is_related = $inv_cat_grp_totals_collection->whereIn('gbh_customer_id',$homeowner_gbh_customer_ids)->first() ? true : false;
-                // if(!($is_related)){
-                //     return redirect()->route('installercardpoints.detail',$card_number)->with("error","Invoice is not home owners' invoice");
-                // }
+                if (!$is_related) {
+                    return redirect()->route('installercardpoints.detail', $card_number)->with("error", "Invoice is not home owners' or installer's invoice");
+                }
             // End Home Owner Checking
+
+            // Start Invoice Date Checking
+                $date = $inv_cat_grp_totals[0]->date; // Date String
+                $dateInstance = Carbon::parse($date);
+                $scannabledate = Carbon::now()->subDays(14);
+                // $scannabledate = Carbon::now()->subMonths(3);
+                // dd($scannabledate);
+                if (!$dateInstance->greaterThanOrEqualTo($scannabledate)) {
+                    // dd('not available');
+                    return redirect()->route('installercardpoints.detail', $card_number)->with("error", "Invoice is not within scannable date of within 14 days.");
+                }
+                // dd("collected");
+            // End Invoice Date Checking
 
             foreach($inv_cat_grp_totals as $inv_cat_grp_total){
                 // dd($inv_cat_grp_total->category_name);
@@ -206,10 +225,6 @@ class InstallerCardPointsController extends Controller
             $gbh_customer_id = $inv_cat_grp_totals[0]->gbh_customer_id;
             $sale_cash_document_id = $inv_cat_grp_totals[0]->sale_cash_document_id;
             $branch_code = $inv_cat_grp_totals[0]->branch_code;
-
-
-
-
 
             $collectiontransaction  = CollectionTransaction::create([
                 'uuid' => (string) Str::uuid(),

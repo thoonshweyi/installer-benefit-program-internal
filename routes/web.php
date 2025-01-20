@@ -100,6 +100,9 @@ Route::group(['middleware' => ['auth','customauth.currentbranch']], function () 
     Route::get('/installercards/match',[InstallerCardsController::class,"match"])->name("installercards.match");
     Route::post('/installercards/matchbysaleamount',[InstallerCardsController::class,"matchbysaleamount"])->name("installercards.matchbysaleamount");
     Route::get('/installercards/register',[InstallerCardsController::class,"register"])->name("installercards.register");
+    Route::post("/installercards/{cardnumber}/approvecardrequest",[InstallerCardsController::class,'approveCardRequest'])->name('installercards.approveCardRequest');
+    Route::post("/installercards/{cardnumber}/rejectcardrequest",[InstallerCardsController::class,'rejectCardRequest'])->name('installercards.rejectCardRequest');
+
 
 
     Route::post('/homeownerinstallers',[HomeownerInstallersController::class,"store"])->name("homeownerinstallers.store");

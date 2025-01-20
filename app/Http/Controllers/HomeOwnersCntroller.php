@@ -38,7 +38,7 @@ class HomeOwnersCntroller extends Controller
 
         $validatearrs = [
             "fullname"=>"required",
-            "phone"=>"required",
+            "phone"=>"required|unique:home_owners,phone",
             "address"=>"required",
             "gender"=>"required",
             "dob"=>"required",
@@ -94,7 +94,7 @@ class HomeOwnersCntroller extends Controller
         $homeowner->save();
 
 
-        return redirect()->route('homeowners.index')->with('success','New Home Owner Registered Successfully');
+        return redirect()->back()->with('success','New Home Owner Registered Successfully');
     }
 
     public function edit($uuid){

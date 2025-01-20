@@ -94,8 +94,7 @@
                                 <th>Card Number</th>
                                 <th>Name</th>
                                 <th>Phone</th>
-                                <th>NRC</th>
-                                <th>Identification Card</th>
+                                <th>Stage</th>
                                 <th>Issued Date</th>
                                 <th>Issued Branch</th>
                                 <th>Issued By</th>
@@ -103,6 +102,7 @@
                                 @can('edit-installer-card')
                                 <th class="text-left">Status</th>
                                 @endcan
+                                <th>Upated At</th>
 
 
                             </tr>
@@ -136,14 +136,22 @@
                                         </td>
                                         @endcan
 
-                                        <td>{{ $installercard->card_number }}</td>
+                                        <td>{{ $installercard->card_number }}
+                                            {!! $installercard->stage == 'pending' ? '<i class="fas fa-comment-dots text-warning ml-2"></i>' : '' !!}
+
+                                        </td>
                                         <td>{{ $installercard->fullname }}</td>
                                         <td>{{ $installercard->phone }}</td>
-                                        <td>{{ $installercard->nrc }}</td>
-                                        <td>{{ $installercard->identification_card }}</td>
-                                        <td>{{  \Carbon\Carbon::parse($installercard->issued_at)->format('d-m-Y') }}</td>
+                                        <td>
+                                            {!! $installercard->stage == "pending" ?"<span class='badge bg-warning'>$installercard->stage</span>" :
+                                            ($installercard->stage == "approved" ? "<span class='badge bg-success'>$installercard->stage</span>" :
+                                            ($installercard->stage == "rejected"? "<span class='badge bg-danger'>$installercard->stage</span>" :
+                                            ($installercard->stage == "issued"? "<span class='badge bg-secondary'>$installercard->stage</span>" : ""
+                                            ))) !!}
+                                        </td>
+                                        <td>{{  \Carbon\Carbon::parse($installercard->issued_at)->format('d-m-Y h:m:s A') }}</td>
                                         <td>{{ $installercard->branch->branch_name_eng }}</td>
-                                        <td>{{ $installercard->users->name }}</td>
+                                        <td>{{ $installercard->user->name }}</td>
                                         @can('edit-installer-card')
                                         <td>
                                             <div class="custom-switch p-0">
@@ -155,6 +163,7 @@
                                             </div>
                                         </td>
                                         @endcan
+                                        <td>{{  \Carbon\Carbon::parse($installercard->updated_at)->format('d-m-Y h:m:s A') }}</td>
 
 
 

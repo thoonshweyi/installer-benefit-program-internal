@@ -26,7 +26,7 @@
                                 <p><strong>Installer Name:</strong> {{ $installercard->fullname }}</p>
                                 <p><strong>Phone Number:</strong> {{ $installercard->phone }}</p>
                                 <p><strong>NRC:</strong> {{ $installercard->nrc }}</p>
-                                <p><strong>Points Expiring Soon:</strong> 100 points by 2024-12-31</p>
+                                {{-- <p><strong>Points Expiring Soon:</strong> 100 points by 2024-12-31</p> --}}
                             </div>
                         </div>
                     @endforeach

@@ -17,7 +17,7 @@
                             <span>Branch - {{ $redemptiontransaction->branch->branch_name_eng }}</span>
                             <span>Installer Name - {{ $redemptiontransaction->requester }}</span>
                         </div>
-                        <span>Date: {{  \Carbon\Carbon::parse($redemptiontransaction->redemption_date)->format('d-m-Y') }}</span>
+                        <span>Date: {{  \Carbon\Carbon::parse($redemptiontransaction->redemption_date)->format('d-m-Y h:m:s A') }}</span>
                     </div>
             </div>
 

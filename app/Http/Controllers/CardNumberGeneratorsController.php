@@ -32,7 +32,8 @@ class CardNumberGeneratorsController extends Controller
         $request->validate([
             'to_branch_id' => 'required',
             'quantity' => "required",
-            'random'=>"required"
+            'random'=>"required",
+            'remark'=>"required"
         ]);
 
         \DB::beginTransaction();

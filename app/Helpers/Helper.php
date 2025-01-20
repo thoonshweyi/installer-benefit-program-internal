@@ -1708,7 +1708,7 @@ function getCustomerInfo($branch_id,$verifyphone){
     return $customer;
 }
 
-function getCustomerInfoById($branch_id,$gbh_customer_id,$customer_barcode){
+function getCustomerInfoById($branch_id,$customer_barcode){
     $customermodel;
     switch($branch_id){
         case 1:
@@ -1751,7 +1751,7 @@ function getCustomerInfoById($branch_id,$gbh_customer_id,$customer_barcode){
 
     // dd($customermodel::where('mobile',$verifyphone)->first());
 
-    $customer = $customermodel::where('gbh_customer_id',$gbh_customer_id)->where('customer_barcode',$customer_barcode)->first();
+    $customer = $customermodel::where('customer_barcode',$customer_barcode)->first();
     return $customer;
 }
 
