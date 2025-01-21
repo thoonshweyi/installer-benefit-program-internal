@@ -215,7 +215,7 @@
 
             <div class="col-md-3 mb-4 mb-md-0 transactionfooters">
                 <p class="mb-1">Approved By</p>
-                <span class="{{ $redemptiontransaction->approvedby ? '' : 'text-muted font-weight-normal' }}">{{ $redemptiontransaction->approvedby ? $redemptiontransaction->approvedby->name : 'N/A' }}</span>
+                <span class="{{ $redemptiontransaction->approvedby ? '' : 'text-muted font-weight-normal' }}">{{ $redemptiontransaction->approvedby ? $redemptiontransaction->approvedby->name : '' }}</span>
                 @if($redemptiontransaction->approvedby)
                 {!!
 
@@ -229,16 +229,19 @@
                         {!! "<span class='text-muted font-weight-normal roles'>(Branch Manager)</span>" !!}
                 @endif
                 <div class="d-flex flex-wrap ">
-                    <span class="font-weight-bold text-info">"</span> <span class="mx-1 text-info">{{  $redemptiontransaction->bm_remark }}</span> <span class="font-weight-bold text-info">"</span>
+                    @if($redemptiontransaction->bm_remark)
+                        <span class="font-weight-bold text-info">"</span> <span class="mx-1 text-info">{{  $redemptiontransaction->bm_remark }}</span> <span class="font-weight-bold text-info">"</span>
+                    @else
 
+                    @endif
                 </div>
-                <span class="{{ $redemptiontransaction->approved_date ? '' : 'text-muted font-weight-normal' }}">{{  $redemptiontransaction->approved_date ? $redemptiontransaction->approved_date : 'MM-DD-YYYY' }}</span>
+                <span class="{{ $redemptiontransaction->approved_date ? '' : 'text-muted font-weight-normal' }}">{{  $redemptiontransaction->approved_date ? $redemptiontransaction->approved_date : '' }}</span>
             </div>
 
 
             <div class="col-md-3 mb-4 mb-md-0 transactionfooters">
                 <p class="mb-1">Paid By</p>
-                <span class="{{ $redemptiontransaction->paidby ? '' : 'text-muted font-weight-normal' }}">{{ $redemptiontransaction->paidby ? $redemptiontransaction->paidby->name : 'N/A' }}</span>
+                <span class="{{ $redemptiontransaction->paidby ? '' : 'text-muted font-weight-normal' }}">{{ $redemptiontransaction->paidby ? $redemptiontransaction->paidby->name : '' }}</span>
                 @if($redemptiontransaction->paidby)
                 {!!
 
@@ -252,9 +255,13 @@
                         {!! "<span class='text-muted font-weight-normal roles'>(Branch Account)</span>" !!}
                 @endif
                 <div class="d-flex flex-wrap ">
-                    <span class="font-weight-bold text-info">"</span> <span class="mx-1 text-info">{{  $redemptiontransaction->ac_remark }}</span> <span class="font-weight-bold text-info">"</span>
+                    @if($redemptiontransaction->ac_remark)
+                        <span class="font-weight-bold text-info">"</span> <span class="mx-1 text-info">{{  $redemptiontransaction->ac_remark }}</span> <span class="font-weight-bold text-info">"</span>
+                    @else
+
+                    @endif
                 </div>
-                <span class="{{ $redemptiontransaction->paid_date ? '' : 'text-muted font-weight-normal' }}">{{  $redemptiontransaction->paid_date ? $redemptiontransaction->paid_date : 'MM-DD-YYYY' }}</span>
+                <span class="{{ $redemptiontransaction->paid_date ? '' : 'text-muted font-weight-normal' }}">{{  $redemptiontransaction->paid_date ? $redemptiontransaction->paid_date : '' }}</span>
 
 
                 <div class="redemptiontransactionfiles">

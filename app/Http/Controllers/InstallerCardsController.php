@@ -199,7 +199,7 @@ class InstallerCardsController extends Controller
         $installercard->credit_amount = 0;
         $installercard->issued_at = Carbon::now();
         $installercard->user_uuid = $user_uuid;
-        $installercard->status = 1;
+        $installercard->status = 0;
         $installercard->save();
         dispatch(new SyncRowJob("installer_cards","insert",$installercard));
 
@@ -592,9 +592,19 @@ class InstallerCardsController extends Controller
                 if(empty($new_installer_card)){
                     return redirect()->back()->with('error', "Firstly Cashier must register new card.");
                 }
-                if ($old_installer_card->gbh_customer_id != $new_installer_card->gbh_customer_id) {
-                    return redirect()->back()->with('error', "This card is only transferable to its original owner.");
+                // if ($old_installer_card->gbh_customer_id != $new_installer_card->gbh_customer_id) {
+                //     return redirect()->back()->with('error', "This card is only transferable to its original owner.");
+                // }
+
+                $activeinstallercard = InstallerCard::where('customer_barcode',$old_installer_card->customer_barcode)
+                                            ->where('status',1)
+                                            ->whereIn("stage",["approved"])
+                                            ->orderBy('created_at','desc')->first();
+                // dd($activeinstallercard->card_number, $new_installer_card->card_number);
+                if($activeinstallercard->card_number != $new_installer_card->card_number){
+                    return redirect()->back()->with('error', "Installer can only transfer to newly created card.");
                 }
+
             // End Check Transfer Avaibility
 
 
@@ -809,12 +819,18 @@ class InstallerCardsController extends Controller
     }
 
     public function approveCardRequest($card_number,Request $request){
+        // dd($request);
+        $request->validate([
+            "agree"=>"required",
+        ]);
+
 
         $user = Auth::user();
         $user_uuid = $user->uuid;
         $installercard = InstallerCard::where("card_number",$card_number)->first();
         // dd($transaction);
         $installercard->update([
+            "status"=>1,
             "stage"=>"approved",
             "approved_by"=>$user_uuid,
             "approved_date"=>now(),
@@ -845,6 +861,7 @@ class InstallerCardsController extends Controller
         // dd($transaction);
 
         $installercard->update([
+            // 'card_number'=> "REJ".$installercard->card_number,
             'status' => 0,
             "stage"=>"rejected",
             "approved_by"=>$user_uuid,

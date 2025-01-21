@@ -143,11 +143,11 @@ class HomeOwnersCntroller extends Controller
 
     }
 
-    public function destroy($card_number){
+    public function destroy($uuid){
         // HomeOwner::destroy($id);
-        $homeowner = HomeOwner::where('card_number',$card_number)->orderBy('id','asc')->first();
+        $homeowner = HomeOwner::where('uuid',$uuid)->orderBy('id','asc')->first();
         $homeowner->delete();
-        return redirect()->route('homeowners.index')->with('success','Installer Deleted Successfully');
+        return redirect()->route('homeowners.index')->with('success','Home Owner Deleted Successfully');
     }
 
 

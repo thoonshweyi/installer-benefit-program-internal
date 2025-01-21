@@ -37,7 +37,7 @@ class InstallerCardPointsController extends Controller
         // dd($installercard);
         $installercardcount = InstallerCard::where('customer_barcode',$installercard->customer_barcode)
                             ->whereIn("stage",["approved"])
-                            ->where('card_number',"!=",$card_number)->count();
+                            ->where('card_number',"!=",$cardnumber)->count();
         // dd($installercardcount);
 
         $user = Auth::user();
@@ -187,12 +187,12 @@ class InstallerCardPointsController extends Controller
 
             // Start Home Owner Checking
                 $homeowneruuids = HomeownerInstaller::where('installer_card_card_number',$card_number)->pluck('home_owner_uuid');
-                $homeowner_gbh_customer_ids = HomeOwner::whereIn('uuid',$homeowneruuids)->pluck('gbh_customer_id');
-                // dd($homeowner_gbh_customer_ids);
+                $homeowner_customer_barcodes = HomeOwner::whereIn('uuid',$homeowneruuids)->pluck('customer_barcode');
+                $installercard_customer_barcode = $installercard->customer_barcode;
+                // dd($homeowner_customer_barcodes,$installercard_customer_barcode,$inv_cat_grp_totals_collection->first()->customer_barcode);
 
-                $installercard_gbh_customer_id = $installercard->gbh_customer_id;
-                $is_related = $inv_cat_grp_totals_collection->filter(function ($item) use ($homeowner_gbh_customer_ids, $installercard_gbh_customer_id) {
-                    return in_array($item->gbh_customer_id, $homeowner_gbh_customer_ids->toArray()) || $item->gbh_customer_id == $installercard_gbh_customer_id;
+                $is_related = $inv_cat_grp_totals_collection->filter(function ($item) use ($homeowner_customer_barcodes, $installercard_customer_barcode) {
+                    return in_array($item->customer_barcode, $homeowner_customer_barcodes->toArray()) || $item->customer_barcode == $installercard_customer_barcode;
                 })->first();
 
                 if (!$is_related) {
@@ -206,10 +206,10 @@ class InstallerCardPointsController extends Controller
                 $scannabledate = Carbon::now()->subDays(14);
                 // $scannabledate = Carbon::now()->subMonths(3);
                 // dd($scannabledate);
-                if (!$dateInstance->greaterThanOrEqualTo($scannabledate)) {
-                    // dd('not available');
-                    return redirect()->route('installercardpoints.detail', $card_number)->with("error", "Invoice is not within scannable date of within 14 days.");
-                }
+                // if (!$dateInstance->greaterThanOrEqualTo($scannabledate)) {
+                //     // dd('not available');
+                //     return redirect()->route('installercardpoints.detail', $card_number)->with("error", "Invoice is not within scannable date of within 14 days.");
+                // }
                 // dd("collected");
             // End Invoice Date Checking
 

@@ -17,7 +17,7 @@ class CreateInstallerCardFilesTable extends Migration
             $table->id();
             $table->string("installer_card_card_number");
             $table->string("image");
-            $table->foreign('installer_card_card_number')->references('card_number')->on('installer_cards')->onDelete('cascade');
+            $table->foreign('installer_card_card_number')->references('card_number')->on('installer_cards')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

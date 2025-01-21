@@ -46,7 +46,13 @@
                                 <li class="nav-item">
                                     <button type="button" id="autoclick" class="tablinks" onclick="gettab(event,'history')">History</button>
                                 </li>
-
+                                @can('transfer-installer-card')
+                                    @if($installercard->isTransferrable())
+                                    <li class="nav-item">
+                                        <button type="button" id="autoclick" class="tablinks" onclick="gettab(event,'transfer')">Transfer</button>
+                                    </li>
+                                    @endif
+                                @endcan
                             </ul>
 
                             <div class="tab-content">
@@ -264,6 +270,16 @@
                                         <form id="bm-form" action="" method="POST" enctype="multipart/form-data">
                                             @csrf
                                             <div class="row align-items-end">
+                                                @if($installercardcount >= 1)
+                                                <div class="col-lg-12 my-2">
+                                                    <div class="form-check">
+                                                        <input type="checkbox" id="agree" name="agree" class=""  value="1"/>
+                                                        <label for="agree" class="text-danger">By clicking Approve, BM already agree this card can accept the transferred points from currently active card .</label>
+                                                    </div>
+                                                </div>
+                                                @else
+                                                    <input type="hidden" id="agree" name="agree" class="" value="1"/>
+                                                @endif
                                                 <div class="col-md-4">
                                                     <div class="form-group m-0">
                                                         <label for="remark" class="m-0">Remark</label>
@@ -302,7 +318,7 @@
 
                                         <div class="col-md-3 mb-4 mb-md-0 transactionfooters">
                                             <p class="mb-1">Approved By</p>
-                                            <span class="{{ $installercard->approvedby ? '' : 'text-muted font-weight-normal' }}">{{ $installercard->approvedby ? $installercard->approvedby->name : 'N/A' }}</span>
+                                            <span class="{{ $installercard->approvedby ? '' : 'text-muted font-weight-normal' }}">{{ $installercard->approvedby ? $installercard->approvedby->name : '' }}</span>
                                             @if($installercard->approvedby)
                                             {!!
 
@@ -316,10 +332,12 @@
                                                     {!! "<span class='text-muted font-weight-normal roles'>(Branch Manager)</span>" !!}
                                             @endif
                                             <div class="d-flex flex-wrap ">
-                                                <span class="font-weight-bold text-info">"</span> <span class="mx-1 text-info">{{  $installercard->bm_remark }}</span> <span class="font-weight-bold text-info">"</span>
-
+                                                @if($installercard->bm_remark)
+                                                    <span class="font-weight-bold text-info">"</span> <span class="mx-1 text-info">{{  $installercard->bm_remark }}</span> <span class="font-weight-bold text-info">"</span>
+                                                @else
+                                                @endif
                                             </div>
-                                            <span class="{{ $installercard->approved_date ? '' : 'text-muted font-weight-normal' }}">{{  $installercard->approved_date ? $installercard->approved_date : 'MM-DD-YYYY' }}</span>
+                                            <span class="{{ $installercard->approved_date ? '' : 'text-muted font-weight-normal' }}">{{  $installercard->approved_date ? $installercard->approved_date : '' }}</span>
                                         </div>
                                     </div>
 
@@ -456,6 +474,117 @@
                                     </table>
 
                                  </div>
+
+                                @can('transfer-installer-card')
+                                @if($installercard->isTransferrable())
+                                <div id="transfer" class="tab-pane">
+                                    <h1>Transfer</h1>
+                                    <div class="row">
+
+                                        <div class="col-lg-4">
+                                            <div class="row">
+                                                <div class="col-lg-4">
+                                                    <label for="name" class="text-warning font-weight-bold">Total Points:</label>
+                                                </div>
+
+                                                <div class="col-lg-8">
+                                                    <div class="form-group">
+                                                        <input type="text" id="totalpoints" name="totalpoints" class="form-control form-control-sm rounded-0 font-weight-bold" readonly style="font-size: 18px" value="{{ intval($installercard->totalpoints) }}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+
+                                                <div class="col-lg-4">
+                                                    <label for="name" class="text-warning font-weight-bold">Total Amount:</label>
+                                                </div>
+
+                                                <div class="col-lg-8">
+                                                    <div class="form-group">
+                                                        <input type="text" id="totalamount" name="totalamount" class="form-control form-control-sm rounded-0 font-weight-bold" readonly style="font-size: 18px" value="{{ number_format($installercard->totalamount,0,'.',',') }}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-lg-4">
+                                                    <label for="name" class="text-warning font-weight-bold">Credit Points:</label>
+                                                </div>
+
+                                                <div class="col-lg-8">
+                                                    <div class="form-group">
+                                                        <input type="text" id="totalpoints" name="totalpoints" class="form-control form-control-sm rounded-0 font-weight-bold" readonly style="font-size: 18px" value="{{ intval($installercard->credit_points) }}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+
+                                                <div class="col-lg-4">
+                                                    <label for="name" class="text-warning font-weight-bold">Credit Amount:</label>
+                                                </div>
+
+                                                <div class="col-lg-8">
+                                                    <div class="form-group">
+                                                        <input type="text" id="totalamount" name="totalamount" class="form-control form-control-sm rounded-0 font-weight-bold" readonly style="font-size: 18px" value="{{ number_format($installercard->credit_amount,0,'.',',') }}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-lg-4">
+                                            <form id="transferform" action="{{ route('installercards.transfer',$installercard->card_number) }}" method="POST" enctype="multipart/form-data">
+                                                    {{ csrf_field() }}
+                                                    <div class="row align-items-end">
+
+                                                            <div class="col-md-12 form-group mb-3">
+                                                                <label for="transfer_type">Transfer Type<span class="text-danger">*</span></label>
+                                                                <select name="transfer_type" id="transfer_type" class="form-control form-control-sm rounded-0">
+                                                                    <option value="" selected disabled>Choose Transfer Type</option>
+                                                                    <option value="change" {{ old("transfer_type") == "change" ? 'selected' : "" }}>Change</option>
+                                                                    <option value="lost" {{ old("transfer_type") == "lost" ? 'selected' : "" }}>Lost</option>
+                                                                </select>
+                                                                @error("transfer_type")
+                                                                <b class="text-danger">{{ $message }}</b>
+                                                                @enderror
+                                                            </div>
+                                                            <div class="col-md-12 form-group mb-3">
+                                                                <label for="old_installer_card_card_number">Old Card Number<span class="text-danger">*</span></label>
+                                                                <input type="text" name="old_installer_card_card_number" id="old_installer_card_card_number" class="form-control form-control-sm rounded-0" value="{{ old('old_installer_card_card_number',$installercard->card_number) }}" readonly/>
+                                                                @error("old_installer_card_card_number")
+                                                                <b class="text-danger">{{ $message }}</b>
+                                                                @enderror
+                                                            </div>
+
+                                                        <div class="col-md-12 form-group mb-3">
+                                                            <label for="new_installer_card_card_number">New Card Number<span class="text-danger">*</span></label>
+                                                            <input type="text" name="new_installer_card_card_number" id="new_installer_card_card_number" class="form-control form-control-sm rounded-0" placeholder="Scan New Card" value="{{ old('new_installer_card_card_number') }}" readonly/>
+                                                            @error("new_installer_card_card_number")
+                                                            <b class="text-danger">{{ $message }}</b>
+                                                            @enderror
+                                                        </div>
+
+                                                        <div class="col-md-12">
+                                                            <label for="images" class="gallery @error('images') is-invalid @enderror"><span>Choose Images</span></label>
+                                                            <input type="file" name="images[]" id="images" class="form-control form-control-sm rounded-0" value="" multiple hidden/>
+                                                            @error("images")
+                                                                <b class="text-danger">{{ $message }}</b>
+                                                            @enderror
+                                                        </div>
+
+
+                                                        <div class="col-md-12 text-sm-end text-start mb-3">
+                                                            <button type="submit" class="btn btn-primary btn-sm rounded-0">Transfer</button>
+                                                        </div>
+                                                    </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                @endif
+                                @endcan
 
                             </div>
                         </div>
@@ -759,7 +888,106 @@
 @section('js')
 <script type="text/javascript">
     $(document).ready(function(){
+        $('.delete-btns').click(function(e){
+            {{-- console.log('hi'); --}}
+            e.preventDefault();
 
+            Swal.fire({
+                title: "Are you sure you want to remove a home owner?",
+                text: "Home Owner will be permanently deleted.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    {{-- console.log($(this).closest('form')); --}}
+                    $(this).closest('form').submit();
+                }
+              });
+
+        });
+
+
+
+        var lastKeyTime = 0;
+        $(document).keypress(function(event) {
+            {{-- console.log(event.target); --}}
+            if(event.target.name == 'new_installer_card_card_number'){
+                var inputField = $('#new_installer_card_card_number');
+
+                // Check if the input is readonly and prevent manual typing
+                if (inputField.prop('readonly')) {
+                    // Append the scanned character to the input field value
+                    if (event.key !== 'Enter') {
+                        var currentTime = new Date().getTime();
+
+                        if(inputField.val() != '' && !(currentTime - lastKeyTime <= 50)){
+                            inputField.val('');
+                        }
+
+                        if (currentTime - lastKeyTime <= 50 || inputField.val() === '') {
+                            inputField.val(inputField.val() + event.key);
+                        } else {
+                            inputField.val('');
+                        }
+                        lastKeyTime = currentTime;
+                    }
+
+                    // Prevent form submission when 'Enter' key is pressed by the scanner
+                    if (event.key === 'Enter') {
+                        event.preventDefault();  // Prevent form submission
+
+                        console.log('Scanned QR Code:', inputField.val());
+                        {{-- $( "#check-btn" ).trigger( "click" ); --}}
+
+                        {{-- $('#collectpointsform').submit(); --}}
+
+                        currentpercent = 4/4 * 100
+                        $('.progress-bar').css('width', `${currentpercent}%`)
+                    }
+                }
+            }
+
+        });
+
+        {{-- Start Preview Image --}}
+
+        var previewimages = function(input,output){
+
+            // console.log(input.files);
+
+            if(input.files){
+                 var totalfiles = input.files.length;
+                 // console.log(totalfiles);
+                 if(totalfiles > 0){
+                      $('.gallery').addClass('removetxt');
+                 }else{
+                      $('.gallery').removeClass('removetxt');
+                 }
+                 console.log(input.files);
+
+                 for(var i = 0 ; i < totalfiles ; i++){
+                      var filereader = new FileReader();
+
+
+                      filereader.onload = function(e){
+                           // $(output).html("");
+                           $($.parseHTML('<img>')).attr('src',e.target.result).appendTo(output);
+                      }
+
+                      filereader.readAsDataURL(input.files[i]);
+
+                 }
+            }
+
+       };
+
+        $('#images').change(function(){
+                previewimages(this,'.gallery');
+        });
+        {{-- End Preview Image --}}
     });
 
     $('#verify-btn').click(verifyinstaller);

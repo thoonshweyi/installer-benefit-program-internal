@@ -119,7 +119,7 @@ class InstallerCard extends Model
                             ->exists();
 
         // Check if the user has the Branch Manager role
-        $isBranchManager = $user->roles()->where('name', 'Branch Manager')->exists();
+        $isBranchManager = $user->roles()->whereIn('name', ['Branch Manager',"Super Admin"])->exists();
          // Return true if both conditions are met
          return $belongsToBranch && $isBranchManager;
 
@@ -128,4 +128,21 @@ class InstallerCard extends Model
         // *compare with current user
     }
 
+
+    public function isTransferrable(){
+        // $installercard = InstallerCard::where('card_number',$this->card_number)->first();
+
+        $lastusedinstallercard = InstallerCard::where('customer_barcode',$this->customer_barcode)
+                            ->where('status',0)
+                            ->whereIn("stage",["approved"])
+                            ->orderBy('created_at','desc')->first();
+
+        if($lastusedinstallercard){
+            if($lastusedinstallercard->card_number == $this->card_number){
+                return true;
+            }
+        }
+        return false;
+
+    }
 }
