@@ -387,8 +387,21 @@
             {{-- console.log('hi'); --}}
             e.preventDefault();
 
-            $('#bm-form').attr('action',"{{ route('redemptiontransactions.approveRedemptionRequest',$redemptiontransaction->uuid) }}");
-            $('#bm-form').submit();
+
+            Swal.fire({
+                title: "Are you sure you want to approve redemption request?",
+                text: "Redemption Transaction will go through the process flow",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, approve it!"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#bm-form').attr('action',"{{ route('redemptiontransactions.approveRedemptionRequest',$redemptiontransaction->uuid) }}");
+                    $('#bm-form').submit();
+                }
+              });
 
         });
 
@@ -404,12 +417,12 @@
                 confirmButtonColor: "#3085d6",
                 cancelButtonColor: "#d33",
                 confirmButtonText: "Yes, reject it!"
-              }).then((result) => {
+            }).then((result) => {
                 if (result.isConfirmed) {
                     $('#ac-form').attr('action',"{{ route('redemptiontransactions.rejectRedemptionRequest', ['redemptiontransaction' => $redemptiontransaction->uuid, 'step' => 'ac']) }}");
                     $('#ac-form').submit();
                 }
-              });
+            });
 
         });
 
@@ -418,8 +431,21 @@
             {{-- console.log('hi'); --}}
             e.preventDefault();
 
-            $('#ac-form').attr('action',"{{ route('redemptiontransactions.paidRedemptionRequest',$redemptiontransaction->uuid) }}");
-            $('#ac-form').submit();
+            Swal.fire({
+                title: "Are you sure you want to paid redemption request?",
+                text: "Redemption Transaction will go through the process flow",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, paid it!"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#ac-form').attr('action',"{{ route('redemptiontransactions.paidRedemptionRequest',$redemptiontransaction->uuid) }}");
+                    $('#ac-form').submit();
+                }
+              });
+
 
         });
 

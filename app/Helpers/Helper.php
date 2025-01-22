@@ -1915,19 +1915,34 @@ function getRetCategoryGroupPointTotal($return_product_docno,$branch_id){
     $db_ext = getConnection($branch_id);
     $inv_cat_grp_totals = $db_ext->select("
         SELECT ------return
-return_date,category_id,category_name,group_id,group_name, saleinvoice_no, gbh_customer_id, return_product_doc_ref_doc_id as sale_cash_document_id, return_product_doc_branchcode,returnamnt, voucher_value::numeric(19,2) as Coupon, (returnamnt::integer*(-1)/10000) as return_point
+	 return_date,category_id,category_name,group_id,group_name, saleinvoice_no,
+	 gbh_customer_id, return_product_doc_ref_doc_id as sale_cash_document_id,
+	 return_product_doc_branchcode
+	 ,(returnamnt-discount) as returnamnt
+	 , voucher_value::numeric(19,2) as Coupon,
+	 ((returnamnt-discount)::integer*(-1)/10000) as return_point
 	FROM (
-	SELECT return_date, category_id,category_name,group_id,group_name, saleinvoice_no, gbh_customer_id, return_product_doc_branchcode, return_product_doc_branchname, sum(total) as returnamnt,return_product_doc_ref_doc_id,sum(voucher_value) as voucher_value
+	SELECT sum(discount) as discount ,return_date, category_id,category_name,group_id,group_name, saleinvoice_no, gbh_customer_id, return_product_doc_branchcode, return_product_doc_branchname, sum(total) as returnamnt,return_product_doc_ref_doc_id,sum(voucher_value) as voucher_value
 	FROM(
 
-	SELECT  return_date,category_id,category_name,group_id,group_name,saleinvoice_no,  gbh_customer_id,return_product_item_barcode_codes, return_product_item_barcode_bill_name, return_product_doc_branchcode, return_product_doc_branchname, good_brAND_name, remark, diposit_type_name as Cate_type, diff*returnprice as  total,return_product_doc_ref_doc_id,0::numeric(19) as voucher_value
+	SELECT  discount,return_date,category_id,category_name,group_id,group_name,saleinvoice_no,
+	 gbh_customer_id,return_product_item_barcode_codes, return_product_item_barcode_bill_name,
+	 return_product_doc_branchcode, return_product_doc_branchname, good_brAND_name,
+	 remark, diposit_type_name as Cate_type, diff*returnprice as  total,
+	 return_product_doc_ref_doc_id,0::numeric(19) as voucher_value
 	FROM(
-	SELECT  return_date, category_id,category_name,group_id,group_name, return_product_doc_ref_docno as saleinvoice_no, tt.return_product_doc_gbh_customer_id as gbh_customer_id,  return_product_item_sale_amount::numeric(19,2) as or, return_product_item_amount::numeric(19,2) as diff, return_product_item_barcode_codes, tt.return_product_item_barcode_bill_name
-                            ,return_product_doc_branchcode, return_product_doc_branchname, good_brAND_name, remark, diposit_type_name, return_product_item_amount::numeric(19,2) as returnqty,return_product_item_sale_price::Numeric(19,2) as returnprice,return_product_doc_ref_doc_id
-	FROM (SELECT return_product_doc_datenow::date as return_date, return_product_doc_gbh_customer_id as gbh_customer_id , CASE WHEN return_product_item_barcode_code ilike '%PRO%' then  substr(return_product_item_barcode_code,4, length(return_product_item_barcode_code) )
+	SELECT  discount,return_date, category_id,category_name,group_id,group_name, return_product_doc_ref_docno as saleinvoice_no, tt.return_product_doc_gbh_customer_id as gbh_customer_id,  return_product_item_sale_amount::numeric(19,2) as or, return_product_item_amount::numeric(19,2) as diff, return_product_item_barcode_codes, tt.return_product_item_barcode_bill_name
+                            ,return_product_doc_branchcode,
+	 return_product_doc_branchname, good_brAND_name, remark,
+	 diposit_type_name, return_product_item_amount::numeric(19,2) as returnqty,
+	 return_product_item_sale_price::Numeric(19,2) as returnprice,return_product_doc_ref_doc_id
+	FROM (SELECT (return_product_item_discount_amount)::numeric(19,2) as discount,return_product_doc_datenow::date as return_date,
+	 return_product_doc_gbh_customer_id as gbh_customer_id , CASE WHEN return_product_item_barcode_code ilike '%PRO%' then  substr(return_product_item_barcode_code,4, length(return_product_item_barcode_code) )
                                     ELSE return_product_item_barcode_code end as return_product_item_barcode_codes, *
-	FROM return_product.return_product_doc bb INNER JOIN return_product.return_product_item cc on bb.return_product_doc_id= cc.return_product_doc_id
-                                LEFT JOIN sale_cash.sale_cash_document sc on bb.return_product_doc_ref_docno=sc.sale_cash_document_no
+	FROM return_product.return_product_doc bb
+	 INNER JOIN return_product.return_product_item cc on bb.return_product_doc_id= cc.return_product_doc_id
+                                LEFT JOIN sale_cash.sale_cash_document sc
+	 on bb.return_product_doc_ref_docno=sc.sale_cash_document_no
                                 WHERE return_product_docno in ('$return_product_docno')
                                 AND cc.return_product_item_amount::numeric(19,2) <> '0' AND return_product_item_active = 't'
                                     )tt
@@ -1937,18 +1952,19 @@ return_date,category_id,category_name,group_id,group_name, saleinvoice_no, gbh_c
                             AND pro.diposit_type_id in ('2','3')
                             where tt.return_product_item_barcode_codes not like '400502%')return
                     )returntable
-                    GROUP BY return_date, category_id,category_name,group_id,group_name, gbh_customer_id, saleinvoice_no, return_product_doc_branchcode, return_product_doc_branchname,return_product_doc_ref_doc_id)return
+                    GROUP BY return_date, category_id,category_name,group_id,group_name,
+	 gbh_customer_id, saleinvoice_no, return_product_doc_branchcode,
+	 return_product_doc_branchname,return_product_doc_ref_doc_id)return
                     right JOIN (SELECT  distinct(return_product_doc_ref_docno)  as sale,max(return_product_doc_datenow)::date as date,(balance_value*1.05)::numeric(19) as saleamount  FROM  return_product.return_product_doc
                     WHERE return_product_docno in  ('$return_product_docno')
                     GROUP BY return_product_doc_ref_docno, balance_value)mx on saleinvoice_no=mx.sale AND return_date=mx.date
                     where category_id is not null
                     -- WHERE returnamnt::Numeric(19,0) <> '0'
-                    GROUP BY return_date, category_id,category_name,group_id,group_name, gbh_customer_id, saleinvoice_no, return_product_doc_branchcode,voucher_value,returnamnt,return_product_doc_ref_doc_id,saleamount
+                    GROUP BY discount,return_date,
+	 category_id,category_name,group_id,group_name, gbh_customer_id, saleinvoice_no,
+	 return_product_doc_branchcode,voucher_value,returnamnt,return_product_doc_ref_doc_id,saleamount
     ");
     return $inv_cat_grp_totals;
-
-
-
 }
 
 

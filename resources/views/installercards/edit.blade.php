@@ -1226,8 +1226,22 @@
         {{-- console.log('hi'); --}}
         e.preventDefault();
 
-        $('#bm-form').attr('action',"{{ route('installercards.approveCardRequest',$installercard->card_number) }}");
-        $('#bm-form').submit();
+        Swal.fire({
+            title: "Are you sure you want to approve card request?",
+            text: "Card will start collecting points after your approval.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, approve it!"
+          }).then((result) => {
+            if (result.isConfirmed) {
+                $('#bm-form').attr('action',"{{ route('installercards.approveCardRequest',$installercard->card_number) }}");
+                $('#bm-form').submit();
+            }
+          });
+
+
 
     });
 </script>

@@ -257,8 +257,21 @@
             {{-- console.log('hi'); --}}
             e.preventDefault();
 
-            $('#mkt-mgr-form').attr('action',"{{ route('cardnumbergenerators.approveCardNumberGenerator',$cardnumbergenerator->uuid) }}");
-            $('#mkt-mgr-form').submit();
+            Swal.fire({
+                title: "Are you sure you want to approve card number generator request?",
+                text: "Card Numbers will be exported after your approval.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, approve it!"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#mkt-mgr-form').attr('action',"{{ route('cardnumbergenerators.approveCardNumberGenerator',$cardnumbergenerator->uuid) }}");
+                    $('#mkt-mgr-form').submit();
+                }
+              });
+
 
         });
 {{--

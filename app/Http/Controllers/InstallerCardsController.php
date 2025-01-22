@@ -861,7 +861,7 @@ class InstallerCardsController extends Controller
         // dd($transaction);
 
         $installercard->update([
-            // 'card_number'=> "REJ".$installercard->card_number,
+            'card_number'=> "REJ".$installercard->card_number,
             'status' => 0,
             "stage"=>"rejected",
             "approved_by"=>$user_uuid,
@@ -870,7 +870,7 @@ class InstallerCardsController extends Controller
         ]);
         dispatch(new SyncRowJob("installer_cards","update",$installercard));
 
-        return redirect()->back()->with('success','Installer Card Rejected Successfully');
+        return redirect()->route("installercards.index")->with('success','Installer Card Rejected Successfully');
 
     }
 }
