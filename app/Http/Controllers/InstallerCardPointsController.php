@@ -184,14 +184,14 @@ class InstallerCardPointsController extends Controller
             }
             // Start Home Owner Checking
 
-                // $homeowneruuids = HomeownerInstaller::where('installer_card_card_number',$card_number)->pluck('home_owner_uuid');
-                // $homeowner_gbh_customer_ids = HomeOwner::whereIn('uuid',$homeowneruuids)->pluck('gbh_customer_id');
-                // // dd($homeowner_gbh_customer_ids);
+                $homeowneruuids = HomeownerInstaller::where('installer_card_card_number',$card_number)->pluck('home_owner_uuid');
+                $homeowner_gbh_customer_ids = HomeOwner::whereIn('uuid',$homeowneruuids)->pluck('gbh_customer_id');
+                // dd($homeowner_gbh_customer_ids);
 
-                // $is_related = $inv_cat_grp_totals_collection->whereIn('gbh_customer_id',$homeowner_gbh_customer_ids)->first() ? true : false;
-                // if(!($is_related)){
-                //     return redirect()->route('installercardpoints.detail',$card_number)->with("error","Invoice is not home owners' invoice");
-                // }
+                $is_related = $inv_cat_grp_totals_collection->whereIn('gbh_customer_id',$homeowner_gbh_customer_ids)->first() ? true : false;
+                if(!($is_related)){
+                    return redirect()->route('installercardpoints.detail',$card_number)->with("error","Invoice is not home owners' invoice");
+                }
             // End Home Owner Checking
 
             foreach($inv_cat_grp_totals as $inv_cat_grp_total){
