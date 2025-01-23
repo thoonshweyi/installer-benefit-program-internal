@@ -32,7 +32,8 @@ class CardNumberGeneratorsController extends Controller
         $request->validate([
             'to_branch_id' => 'required',
             'quantity' => "required",
-            'random'=>"required"
+            'random'=>"required",
+            'remark'=>"required"
         ]);
 
         \DB::beginTransaction();
@@ -223,7 +224,13 @@ class CardNumberGeneratorsController extends Controller
                 "approved_date"=>now(),
                 "mkt_mgr_remark"=>$request->remark
             ]);
+        }
 
+        $cardnumbers = CardNumber::where('card_number_generator_uuid',$uuid)->get();
+        foreach($cardnumbers as $cardnumber){
+            $cardnumber->update([
+                'card_number'=> "REJ".$cardnumber->card_number
+            ]);
         }
 
         // readIRENotification($uuid);

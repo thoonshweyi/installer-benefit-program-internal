@@ -94,8 +94,7 @@
                                 <th>Card Number</th>
                                 <th>Name</th>
                                 <th>Phone</th>
-                                <th>NRC</th>
-                                <th>Identification Card</th>
+                                <th>Stage</th>
                                 <th>Issued Date</th>
                                 <th>Issued Branch</th>
                                 <th>Issued By</th>
@@ -103,6 +102,7 @@
                                 @can('edit-installer-card')
                                 <th class="text-left">Status</th>
                                 @endcan
+                                <th>Upated At</th>
 
 
                             </tr>
@@ -121,9 +121,9 @@
                                                     <a href="{{ route('installercards.edit',$installercard->card_number) }}" class="mr-2" title="Edit"><i class="fas fa-edit"></i></a>
                                                 @endcan
 
-                                                @can('transfer-installer-card')
+                                                {{-- @can('transfer-installer-card')
                                                     <a href="javascript:void(0);" class="ml-2 transfer-btns" data-old_installer_card_card_number="{{ $installercard->card_number }}"><i class="fas fa-exchange-alt"></i></a>
-                                                @endcan
+                                                @endcan --}}
 
                                                 @can('delete-installer-card')
                                                 <form action="{{ route('installercards.destroy',$installercard->card_number) }}" method="POST">
@@ -136,14 +136,22 @@
                                         </td>
                                         @endcan
 
-                                        <td>{{ $installercard->card_number }}</td>
+                                        <td>{{ $installercard->card_number }}
+                                            {!! $installercard->stage == 'pending' ? '<i class="fas fa-comment-dots text-warning ml-2"></i>' : '' !!}
+
+                                        </td>
                                         <td>{{ $installercard->fullname }}</td>
                                         <td>{{ $installercard->phone }}</td>
-                                        <td>{{ $installercard->nrc }}</td>
-                                        <td>{{ $installercard->identification_card }}</td>
-                                        <td>{{  \Carbon\Carbon::parse($installercard->issued_at)->format('d-m-Y') }}</td>
+                                        <td>
+                                            {!! $installercard->stage == "pending" ?"<span class='badge bg-warning'>$installercard->stage</span>" :
+                                            ($installercard->stage == "approved" ? "<span class='badge bg-success'>$installercard->stage</span>" :
+                                            ($installercard->stage == "rejected"? "<span class='badge bg-danger'>$installercard->stage</span>" :
+                                            ($installercard->stage == "issued"? "<span class='badge bg-secondary'>$installercard->stage</span>" : ""
+                                            ))) !!}
+                                        </td>
+                                        <td>{{  \Carbon\Carbon::parse($installercard->issued_at)->format('d-m-Y h:m:s A') }}</td>
                                         <td>{{ $installercard->branch->branch_name_eng }}</td>
-                                        <td>{{ $installercard->users->name }}</td>
+                                        <td>{{ $installercard->user->name }}</td>
                                         @can('edit-installer-card')
                                         <td>
                                             <div class="custom-switch p-0">
@@ -155,6 +163,7 @@
                                             </div>
                                         </td>
                                         @endcan
+                                        <td>{{  \Carbon\Carbon::parse($installercard->updated_at)->format('d-m-Y h:m:s A') }}</td>
 
 
 
@@ -180,75 +189,6 @@
     <!-- Modal Edit -->
 </div>
 
-
-
- <!-- START MODAL AREA -->
-          <!-- start edit modal -->
-        <div id="transfermodel" class="modal fade">
-            <div class="modal-dialog modal-dialog-centered">
-                 <div class="modal-content">
-                      <div class="modal-header">
-                           <h6 class="modal-title">Transfer Form</h6>
-                           <button type="" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                      </div>
-
-                      <div class="modal-body">
-                           <form id="transferform" action="" method="POST" enctype="multipart/form-data">
-                                {{ csrf_field() }}
-                                <div class="row align-items-end">
-
-                                        <div class="col-md-12 form-group mb-3">
-                                            <label for="transfer_type">Transfer Type<span class="text-danger">*</span></label>
-                                            <select name="transfer_type" id="transfer_type" class="form-control form-control-sm rounded-0">
-                                                <option value="" selected disabled>Choose Transfer Type</option>
-                                                <option value="change" {{ old("transfer_type") == "change" ? 'selected' : "" }}>Change</option>
-                                                <option value="lost" {{ old("transfer_type") == "lost" ? 'selected' : "" }}>Lost</option>
-                                            </select>
-                                            @error("transfer_type")
-                                            <b class="text-danger">{{ $message }}</b>
-                                            @enderror
-                                        </div>
-                                        <div class="col-md-12 form-group mb-3">
-                                            <label for="old_installer_card_card_number">Old Card Number<span class="text-danger">*</span></label>
-                                            <input type="text" name="old_installer_card_card_number" id="old_installer_card_card_number" class="form-control form-control-sm rounded-0" value="{{ old('old_installer_card_card_number') }}" readonly/>
-                                            @error("old_installer_card_card_number")
-                                            <b class="text-danger">{{ $message }}</b>
-                                            @enderror
-                                        </div>
-
-                                     <div class="col-md-12 form-group mb-3">
-                                          <label for="new_installer_card_card_number">New Card Number<span class="text-danger">*</span></label>
-                                          <input type="text" name="new_installer_card_card_number" id="new_installer_card_card_number" class="form-control form-control-sm rounded-0" placeholder="Scan New Card" value="{{ old('new_installer_card_card_number') }}" readonly/>
-                                          @error("new_installer_card_card_number")
-                                          <b class="text-danger">{{ $message }}</b>
-                                          @enderror
-                                    </div>
-
-                                     <div class="col-md-12">
-                                        <label for="images" class="gallery @error('images') is-invalid @enderror"><span>Choose Images</span></label>
-                                        <input type="file" name="images[]" id="images" class="form-control form-control-sm rounded-0" value="" multiple hidden/>
-                                        @error("images")
-                                            <b class="text-danger">{{ $message }}</b>
-                                        @enderror
-                                    </div>
-
-
-                                     <div class="col-md-12 text-sm-end text-start mb-3">
-                                          <button type="submit" class="btn btn-primary btn-sm rounded-0">Transfer</button>
-                                     </div>
-                                </div>
-                           </form>
-                      </div>
-
-                      <div class="modal-footer">
-
-                      </div>
-                 </div>
-            </div>
-       </div>
-
-  <!-- end edit modal -->
-<!-- END MODAL AREA -->
 
 @endsection
 

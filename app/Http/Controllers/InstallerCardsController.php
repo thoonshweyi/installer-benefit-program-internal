@@ -199,20 +199,20 @@ class InstallerCardsController extends Controller
         $installercard->credit_amount = 0;
         $installercard->issued_at = Carbon::now();
         $installercard->user_uuid = $user_uuid;
-        $installercard->status = 1;
+        $installercard->status = 0;
         $installercard->save();
         dispatch(new SyncRowJob("installer_cards","insert",$installercard));
 
 
-        // Update Other Card Status as Inactive
-        $otherinstallercards = InstallerCard::where('gbh_customer_id',$installercard->gbh_customer_id)->where("card_number","!=",$installercard->card_number)->get();
-        foreach($otherinstallercards as $otherinstallercard){
-            // Update all matching rows' status to inactive (status = 0) in one query
-            $otherinstallercard->update([
-                'status' => 0
-            ]);
-            dispatch(new SyncRowJob("installer_cards","update",$otherinstallercard));
-        }
+        // // Update Other Card Status as Inactive
+        // $otherinstallercards = InstallerCard::where('gbh_customer_id',$installercard->gbh_customer_id)->where("card_number","!=",$installercard->card_number)->get();
+        // foreach($otherinstallercards as $otherinstallercard){
+        //     // Update all matching rows' status to inactive (status = 0) in one query
+        //     $otherinstallercard->update([
+        //         'status' => 0
+        //     ]);
+        //     dispatch(new SyncRowJob("installer_cards","update",$otherinstallercard));
+        // }
 
 
 
@@ -302,10 +302,14 @@ class InstallerCardsController extends Controller
     public function edit($card_number){
         $installercard = InstallerCard::where('card_number',$card_number)->orderBy('id','asc')->first();
 
-        $installercardcount = InstallerCard::where('gbh_customer_id',$installercard->gbh_customer_id)->where('card_number',"!=",$card_number)->count();
+        $installercardcount = InstallerCard::where('customer_barcode',$installercard->customer_barcode)
+                                ->whereIn("stage",["approved"])
+                                ->where('card_number',"!=",$card_number)->count();
         // dd($installercardcount);
 
-        $card_numbers = InstallerCard::where('gbh_customer_id',$installercard->gbh_customer_id)->where("card_number","!=",$card_number)->pluck('card_number');
+        $card_numbers = InstallerCard::where('customer_barcode',$installercard->customer_barcode)
+                        ->whereIn("stage",["approved"])
+                        ->where("card_number","!=",$card_number)->pluck('card_number');
 
 
         $homeower_uuids = HomeownerInstaller::pluck('home_owner_uuid');
@@ -318,11 +322,10 @@ class InstallerCardsController extends Controller
 
     public function refresh($card_number){
         $installercard = InstallerCard::where('card_number',$card_number)->orderBy('id','asc')->first();
-        $gbh_customer_id = $installercard->gbh_customer_id;
         $customer_barcode = $installercard->customer_barcode;
 
         $branch_id = getCurrentBranch();
-        $gbhcustomer = getCustomerInfoById($branch_id,$gbh_customer_id,$customer_barcode);
+        $gbhcustomer = getCustomerInfoById($branch_id,$customer_barcode);
 
         // dd($gbhcustomer);
         $installercard->update([
@@ -353,7 +356,7 @@ class InstallerCardsController extends Controller
         dispatch(new SyncRowJob("installer_cards","update",$installercard));
 
 
-        return redirect()->route('installercards.edit',$card_number)->with('Installer Card Updated');
+        return redirect()->route('installercards.edit',$card_number)->with("success",'Installer Card Updated');
 
     }
 
@@ -432,10 +435,13 @@ class InstallerCardsController extends Controller
         $installercard = InstallerCard::where('card_number',$inscardnumber)->first();
 
         if($installercard){
-            if($installercard->status === 1){
-                return response()->json(["installercard"=>$installercard]);
-            }else{
+            if($installercard->stage === 'pending'){
+                return response()->json(["title"=>"Oops, Installer Card Invalid","message"=>"Installer Card is not approved yet"]);
+            }
+            else  if($installercard->status === 0){
                 return response()->json(["title"=>"Oops, Installer Card Invalid","message"=>"Installer Card is deactivated"]);
+            }else{
+                return response()->json(["installercard"=>$installercard]);
             }
         }else{
             return response()->json(["title"=>"Oops, Installer Card Not Found","message"=>"Installer Card Number Incorrect!!"]);
@@ -453,7 +459,9 @@ class InstallerCardsController extends Controller
     public function track($card_number,Request $request){
         $installercard = InstallerCard::where('card_number',$card_number)->first();
 
-        $allinstallercards = InstallerCard::where('gbh_customer_id',$installercard->gbh_customer_id)->orderBy('created_at','desc')->get();
+        $allinstallercards = InstallerCard::where('customer_barcode',$installercard->customer_barcode)
+                            ->whereIn("stage",["approved"])
+                            ->orderBy('created_at','desc')->get();
         // dd($allinstallercards);
 
 
@@ -584,9 +592,19 @@ class InstallerCardsController extends Controller
                 if(empty($new_installer_card)){
                     return redirect()->back()->with('error', "Firstly Cashier must register new card.");
                 }
-                if ($old_installer_card->gbh_customer_id != $new_installer_card->gbh_customer_id) {
-                    return redirect()->back()->with('error', "This card is only transferable to its original owner.");
+                // if ($old_installer_card->gbh_customer_id != $new_installer_card->gbh_customer_id) {
+                //     return redirect()->back()->with('error', "This card is only transferable to its original owner.");
+                // }
+
+                $activeinstallercard = InstallerCard::where('customer_barcode',$old_installer_card->customer_barcode)
+                                            ->where('status',1)
+                                            ->whereIn("stage",["approved"])
+                                            ->orderBy('created_at','desc')->first();
+                // dd($activeinstallercard->card_number, $new_installer_card->card_number);
+                if($activeinstallercard->card_number != $new_installer_card->card_number){
+                    return redirect()->back()->with('error', "Installer can only transfer to newly created card.");
                 }
+
             // End Check Transfer Avaibility
 
 
@@ -798,5 +816,61 @@ class InstallerCardsController extends Controller
     public function getInstallerCriterias(){
         $installer_criterias = ["prevmonths_sale_amt_limit"=>1000000];
         return $installer_criterias;
+    }
+
+    public function approveCardRequest($card_number,Request $request){
+        // dd($request);
+        $request->validate([
+            "agree"=>"required",
+        ]);
+
+
+        $user = Auth::user();
+        $user_uuid = $user->uuid;
+        $installercard = InstallerCard::where("card_number",$card_number)->first();
+        // dd($transaction);
+        $installercard->update([
+            "status"=>1,
+            "stage"=>"approved",
+            "approved_by"=>$user_uuid,
+            "approved_date"=>now(),
+            "bm_remark"=>$request->remark
+        ]);
+        dispatch(new SyncRowJob("installer_cards","update",$installercard));
+
+        // Update Other Card Status as Inactive
+        $otherinstallercards = InstallerCard::where('gbh_customer_id',$installercard->gbh_customer_id)->where("card_number","!=",$installercard->card_number)->get();
+        foreach($otherinstallercards as $otherinstallercard){
+            // Update all matching rows' status to inactive (status = 0) in one query
+            $otherinstallercard->update([
+                'status' => 0
+            ]);
+            dispatch(new SyncRowJob("installer_cards","update",$otherinstallercard));
+        }
+
+        return redirect()->back()->with('success','Installer Card Approved Successfully');
+
+    }
+
+    public function rejectCardRequest($card_number,Request $request){
+        // dd('hay');
+
+        $user = Auth::user();
+        $user_uuid = $user->uuid;
+        $installercard = InstallerCard::where("card_number",$card_number)->first();
+        // dd($transaction);
+
+        $installercard->update([
+            'card_number'=> "REJ".$installercard->card_number,
+            'status' => 0,
+            "stage"=>"rejected",
+            "approved_by"=>$user_uuid,
+            "approved_date"=>now(),
+            "bm_remark"=>$request->remark
+        ]);
+        dispatch(new SyncRowJob("installer_cards","update",$installercard));
+
+        return redirect()->route("installercards.index")->with('success','Installer Card Rejected Successfully');
+
     }
 }

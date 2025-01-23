@@ -11,7 +11,9 @@
                     </div>
                 </div>
             </div>
-
+            <div class="col-md-12 my-2">
+                <button type="button" id="back-btn" class="btn btn-warning mr-2" onclick="window.history.back();">Back</button>
+            </div></br>
             <div class="col-lg-12 mb-4">
                 <div class="row">
                     @foreach ($allinstallercards as $installercard)
@@ -26,7 +28,7 @@
                                 <p><strong>Installer Name:</strong> {{ $installercard->fullname }}</p>
                                 <p><strong>Phone Number:</strong> {{ $installercard->phone }}</p>
                                 <p><strong>NRC:</strong> {{ $installercard->nrc }}</p>
-                                <p><strong>Points Expiring Soon:</strong> 100 points by 2024-12-31</p>
+                                {{-- <p><strong>Points Expiring Soon:</strong> 100 points by 2024-12-31</p> --}}
                             </div>
                         </div>
                     @endforeach

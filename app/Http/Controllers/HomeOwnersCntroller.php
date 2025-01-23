@@ -38,7 +38,7 @@ class HomeOwnersCntroller extends Controller
 
         $validatearrs = [
             "fullname"=>"required",
-            "phone"=>"required",
+            "phone"=>"required|unique:home_owners,phone",
             "address"=>"required",
             "gender"=>"required",
             "dob"=>"required",
@@ -94,7 +94,7 @@ class HomeOwnersCntroller extends Controller
         $homeowner->save();
 
 
-        return redirect()->route('homeowners.index')->with('success','New Home Owner Registered Successfully');
+        return redirect()->back()->with('success','New Home Owner Registered Successfully');
     }
 
     public function edit($uuid){
@@ -143,11 +143,11 @@ class HomeOwnersCntroller extends Controller
 
     }
 
-    public function destroy($card_number){
+    public function destroy($uuid){
         // HomeOwner::destroy($id);
-        $homeowner = HomeOwner::where('card_number',$card_number)->orderBy('id','asc')->first();
+        $homeowner = HomeOwner::where('uuid',$uuid)->orderBy('id','asc')->first();
         $homeowner->delete();
-        return redirect()->route('homeowners.index')->with('success','Installer Deleted Successfully');
+        return redirect()->route('homeowners.index')->with('success','Home Owner Deleted Successfully');
     }
 
 

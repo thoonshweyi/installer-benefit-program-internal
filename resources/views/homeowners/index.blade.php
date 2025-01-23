@@ -124,7 +124,7 @@
                                         <td>{{ $homeowner->nrc }}</td>
                                         <td>{{ $homeowner->identification_card }}</td>
                                         <td>{{ $homeowner->users->name }}</td>
-                                        <td>{{  \Carbon\Carbon::parse($homeowner->created_at)->format('d-m-Y') }}</td>
+                                        <td>{{  \Carbon\Carbon::parse($homeowner->created_at)->format('d-m-Y h:m:s A') }}</td>
 
 
                                 </tr>

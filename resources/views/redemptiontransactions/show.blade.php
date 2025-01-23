@@ -17,7 +17,7 @@
                             <span>Branch - {{ $redemptiontransaction->branch->branch_name_eng }}</span>
                             <span>Installer Name - {{ $redemptiontransaction->requester }}</span>
                         </div>
-                        <span>Date: {{  \Carbon\Carbon::parse($redemptiontransaction->redemption_date)->format('d-m-Y') }}</span>
+                        <span>Date: {{  \Carbon\Carbon::parse($redemptiontransaction->redemption_date)->format('d-m-Y h:m:s A') }}</span>
                     </div>
             </div>
 
@@ -215,7 +215,7 @@
 
             <div class="col-md-3 mb-4 mb-md-0 transactionfooters">
                 <p class="mb-1">Approved By</p>
-                <span class="{{ $redemptiontransaction->approvedby ? '' : 'text-muted font-weight-normal' }}">{{ $redemptiontransaction->approvedby ? $redemptiontransaction->approvedby->name : 'N/A' }}</span>
+                <span class="{{ $redemptiontransaction->approvedby ? '' : 'text-muted font-weight-normal' }}">{{ $redemptiontransaction->approvedby ? $redemptiontransaction->approvedby->name : '' }}</span>
                 @if($redemptiontransaction->approvedby)
                 {!!
 
@@ -229,16 +229,19 @@
                         {!! "<span class='text-muted font-weight-normal roles'>(Branch Manager)</span>" !!}
                 @endif
                 <div class="d-flex flex-wrap ">
-                    <span class="font-weight-bold text-info">"</span> <span class="mx-1 text-info">{{  $redemptiontransaction->bm_remark }}</span> <span class="font-weight-bold text-info">"</span>
+                    @if($redemptiontransaction->bm_remark)
+                        <span class="font-weight-bold text-info">"</span> <span class="mx-1 text-info">{{  $redemptiontransaction->bm_remark }}</span> <span class="font-weight-bold text-info">"</span>
+                    @else
 
+                    @endif
                 </div>
-                <span class="{{ $redemptiontransaction->approved_date ? '' : 'text-muted font-weight-normal' }}">{{  $redemptiontransaction->approved_date ? $redemptiontransaction->approved_date : 'MM-DD-YYYY' }}</span>
+                <span class="{{ $redemptiontransaction->approved_date ? '' : 'text-muted font-weight-normal' }}">{{  $redemptiontransaction->approved_date ? $redemptiontransaction->approved_date : '' }}</span>
             </div>
 
 
             <div class="col-md-3 mb-4 mb-md-0 transactionfooters">
                 <p class="mb-1">Paid By</p>
-                <span class="{{ $redemptiontransaction->paidby ? '' : 'text-muted font-weight-normal' }}">{{ $redemptiontransaction->paidby ? $redemptiontransaction->paidby->name : 'N/A' }}</span>
+                <span class="{{ $redemptiontransaction->paidby ? '' : 'text-muted font-weight-normal' }}">{{ $redemptiontransaction->paidby ? $redemptiontransaction->paidby->name : '' }}</span>
                 @if($redemptiontransaction->paidby)
                 {!!
 
@@ -252,9 +255,13 @@
                         {!! "<span class='text-muted font-weight-normal roles'>(Branch Account)</span>" !!}
                 @endif
                 <div class="d-flex flex-wrap ">
-                    <span class="font-weight-bold text-info">"</span> <span class="mx-1 text-info">{{  $redemptiontransaction->ac_remark }}</span> <span class="font-weight-bold text-info">"</span>
+                    @if($redemptiontransaction->ac_remark)
+                        <span class="font-weight-bold text-info">"</span> <span class="mx-1 text-info">{{  $redemptiontransaction->ac_remark }}</span> <span class="font-weight-bold text-info">"</span>
+                    @else
+
+                    @endif
                 </div>
-                <span class="{{ $redemptiontransaction->paid_date ? '' : 'text-muted font-weight-normal' }}">{{  $redemptiontransaction->paid_date ? $redemptiontransaction->paid_date : 'MM-DD-YYYY' }}</span>
+                <span class="{{ $redemptiontransaction->paid_date ? '' : 'text-muted font-weight-normal' }}">{{  $redemptiontransaction->paid_date ? $redemptiontransaction->paid_date : '' }}</span>
 
 
                 <div class="redemptiontransactionfiles">
@@ -380,8 +387,21 @@
             {{-- console.log('hi'); --}}
             e.preventDefault();
 
-            $('#bm-form').attr('action',"{{ route('redemptiontransactions.approveRedemptionRequest',$redemptiontransaction->uuid) }}");
-            $('#bm-form').submit();
+
+            Swal.fire({
+                title: "Are you sure you want to approve redemption request?",
+                text: "Redemption Transaction will go through the process flow",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, approve it!"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#bm-form').attr('action',"{{ route('redemptiontransactions.approveRedemptionRequest',$redemptiontransaction->uuid) }}");
+                    $('#bm-form').submit();
+                }
+              });
 
         });
 
@@ -397,12 +417,12 @@
                 confirmButtonColor: "#3085d6",
                 cancelButtonColor: "#d33",
                 confirmButtonText: "Yes, reject it!"
-              }).then((result) => {
+            }).then((result) => {
                 if (result.isConfirmed) {
                     $('#ac-form').attr('action',"{{ route('redemptiontransactions.rejectRedemptionRequest', ['redemptiontransaction' => $redemptiontransaction->uuid, 'step' => 'ac']) }}");
                     $('#ac-form').submit();
                 }
-              });
+            });
 
         });
 
@@ -411,8 +431,21 @@
             {{-- console.log('hi'); --}}
             e.preventDefault();
 
-            $('#ac-form').attr('action',"{{ route('redemptiontransactions.paidRedemptionRequest',$redemptiontransaction->uuid) }}");
-            $('#ac-form').submit();
+            Swal.fire({
+                title: "Are you sure you want to paid redemption request?",
+                text: "Redemption Transaction will go through the process flow",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, paid it!"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#ac-form').attr('action',"{{ route('redemptiontransactions.paidRedemptionRequest',$redemptiontransaction->uuid) }}");
+                    $('#ac-form').submit();
+                }
+              });
+
 
         });
 

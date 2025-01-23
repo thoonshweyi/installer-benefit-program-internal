@@ -375,3 +375,16 @@ body{
     margin: 0 !important;
     position: relative;
 }
+
+
+.modal-dialog-fullscreen {
+    width: calc(100% - 260px) !important;
+    max-width:  calc(100% - 260px) !important;
+}
+
+@media (max-width: 1299px) {
+    .modal-dialog-fullscreen {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}

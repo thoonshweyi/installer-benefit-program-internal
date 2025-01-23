@@ -71,7 +71,7 @@ class RedemptionTransaction extends Model
                             ->exists();
 
         // Check if the user has the Branch Manager role
-        $isBranchManager = $user->roles()->where('name', 'Branch Manager')->exists();
+        $isBranchManager = $user->roles()->whereIn('name', ['Branch Manager',"Super Admin"])->exists();
          // Return true if both conditions are met
          return $belongsToBranch && $isBranchManager;
 
@@ -91,7 +91,7 @@ class RedemptionTransaction extends Model
                             ->exists();
 
         // Check if the user has the Branch Manager role
-        $isBranchManager = $user->roles()->where('name', 'Finance')->exists();
+        $isBranchManager = $user->roles()->whereIn('name', ['Finance',"Super Admin"])->exists();
          // Return true if both conditions are met
         return $belongsToBranch && $isBranchManager;
 

@@ -102,7 +102,7 @@ class CardNumberGenerator extends Model
                             ->exists();
 
         // Check if the user has the Branch Manager role
-        $isMktManager = $user->roles()->where('name', 'Marketing Manager')->exists();
+        $isMktManager = $user->roles()->whereIn('name', ['Marketing Manager',"Super Admin"])->exists();
          // Return true if both conditions are met
          return $belongsToBranch && $isMktManager;
     }
@@ -116,7 +116,20 @@ class CardNumberGenerator extends Model
 
 
         return ($user == $prepareby_user);
+    }
 
+    public function multipleExportUser(){
+        $user = Auth::user();
+
+        $belongsToBranch = BranchUser::where('user_uuid', $user->uuid)
+        ->where('branch_id', $this->branch_id)
+        ->exists();
+
+        // Check if the user has the Branch Manager role
+        $isMktManager = $user->roles()->whereIn('name', ["Super Admin"])->exists();
+
+
+        return $belongsToBranch && $isMktManager;
     }
 
 

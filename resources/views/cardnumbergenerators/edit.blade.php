@@ -42,13 +42,13 @@
                                         "<span class='badge bg-warning'>$cardnumbergenerator->status</span>" :
                                         ($cardnumbergenerator->status == "approved" ? "<span class='badge bg-success'>$cardnumbergenerator->status</span>" :
                                         ($cardnumbergenerator->status == "rejected"? "<span class='badge bg-danger'>$cardnumbergenerator->status</span>" :
-                                        ($cardnumbergenerator->status == "exported"? "<span class='badge bg-secondary'>$cardnumbergenerator->status</span>" : ""
+                                        ($cardnumbergenerator->status == "exported"? "<span class='badge bg-primary'>$cardnumbergenerator->status</span>" : ""
                                         ))) !!}
                                     </h4>
                                     <div class="d-flex justify-content-between font-weight-bold">
                                         <div class="d-flex flex-column">
                                             <span>Branch - {{ $cardnumbergenerator->branch->branch_name_eng }}</span>
-                                            <span>Date: {{  \Carbon\Carbon::parse($cardnumbergenerator->created_at)->format('d-m-Y') }}</span>
+                                            <span>Date: {{  \Carbon\Carbon::parse($cardnumbergenerator->created_at)->format('d-m-Y h:m:s A') }}</span>
                                             {{-- <span>Installer Name - {{ $collectiontransaction->installercard->fullname }}</span> --}}
                                         </div>
                                     </div>
@@ -115,11 +115,9 @@
                             <div class="table-responsive rounded">
                                 <h5>Card Number</h5>
 
-                                @if($cardnumbergenerator->isFinishedAuthUser() && $cardnumbergenerator->status === "approved")
-                                <a href=" {{ route('cardnumbergenerators.export',$cardnumbergenerator->uuid) }}" id="export-btn" class="btn btn-primary my-2">Export</a>
-                                {{-- <a href="javascript:void(0);" id="export-btn" class="btn btn-primary my-2">Export</a> --}}
-
-
+                                @if(($cardnumbergenerator->isFinishedAuthUser() && $cardnumbergenerator->status === "approved") || $cardnumbergenerator->multipleExportUser())
+                                    <a href=" {{ route('cardnumbergenerators.export',$cardnumbergenerator->uuid) }}" id="export-btn" class="btn btn-primary my-2">Export</a>
+                                    {{-- <a href="javascript:void(0);" id="export-btn" class="btn btn-primary my-2">Export</a> --}}
                                 @endif
 
 
@@ -191,7 +189,7 @@
 
                             <div class="col-md-3 mb-4 mb-md-0 transactionfooters">
                                 <p class="mb-1">Approved By</p>
-                                <span class="{{ $cardnumbergenerator->approvedby ? '' : 'text-muted font-weight-normal' }}">{{ $cardnumbergenerator->approvedby ? $cardnumbergenerator->approvedby->name : 'N/A' }}</span>
+                                <span class="{{ $cardnumbergenerator->approvedby ? '' : 'text-muted font-weight-normal' }}">{{ $cardnumbergenerator->approvedby ? $cardnumbergenerator->approvedby->name : '' }}</span>
                                 @if($cardnumbergenerator->approvedby)
                                 {!!
 
@@ -205,10 +203,13 @@
                                         {!! "<span class='text-muted font-weight-normal roles'>(Marketing Manager)</span>" !!}
                                 @endif
                                 <div class="d-flex flex-wrap ">
-                                    <span class="font-weight-bold text-info">"</span> <span class="mx-1 text-info">{{  $cardnumbergenerator->mkt_mgr_remark }}</span> <span class="font-weight-bold text-info">"</span>
+                                    @if($cardnumbergenerator->mkt_mgr_remark)
+                                        <span class="font-weight-bold text-info">"</span> <span class="mx-1 text-info">{{  $cardnumbergenerator->mkt_mgr_remark }}</span> <span class="font-weight-bold text-info">"</span>
+                                    @else
 
+                                    @endif
                                 </div>
-                                <span class="{{ $cardnumbergenerator->approved_date ? '' : 'text-muted font-weight-normal' }}">{{  $cardnumbergenerator->approved_date ? $cardnumbergenerator->approved_date : 'MM-DD-YYYY' }}</span>
+                                <span class="{{ $cardnumbergenerator->approved_date ? '' : 'text-muted font-weight-normal' }}">{{  $cardnumbergenerator->approved_date ? $cardnumbergenerator->approved_date : '' }}</span>
                             </div>
                         </div>
 
@@ -256,8 +257,21 @@
             {{-- console.log('hi'); --}}
             e.preventDefault();
 
-            $('#mkt-mgr-form').attr('action',"{{ route('cardnumbergenerators.approveCardNumberGenerator',$cardnumbergenerator->uuid) }}");
-            $('#mkt-mgr-form').submit();
+            Swal.fire({
+                title: "Are you sure you want to approve card number generator request?",
+                text: "Card Numbers will be exported after your approval.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, approve it!"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#mkt-mgr-form').attr('action',"{{ route('cardnumbergenerators.approveCardNumberGenerator',$cardnumbergenerator->uuid) }}");
+                    $('#mkt-mgr-form').submit();
+                }
+              });
+
 
         });
 {{--
