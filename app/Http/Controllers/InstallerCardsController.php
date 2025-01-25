@@ -8,6 +8,7 @@ use App\Jobs\SyncRowJob;
 use App\Models\Province;
 use App\Models\HomeOwner;
 use App\Models\BranchUser;
+use App\Models\CardNumber;
 use Illuminate\Support\Str;
 use App\Models\ReturnBanner;
 use Illuminate\Http\Request;
@@ -151,6 +152,7 @@ class InstallerCardsController extends Controller
             "images.*"=>"mimes:jpg,jpeg,png,pdf|max:10240",
         ];
 
+
         $user = Auth::user();
         $user_id = $user->id;
         $user_uuid = $user->uuid;
@@ -161,6 +163,14 @@ class InstallerCardsController extends Controller
         }
 
         $request->validate($validatearrs);
+
+        $approve_cardnumbers = CardNumber::whereHas("cardnumbergenerator",function($query){
+            $query->whereIn("status",["approved","exported"]);
+        })->pluck("card_number");
+
+        if(!in_array($request->card_number,$approve_cardnumbers->toArray())){
+            return redirect()->back()->with("error","Installer card number is not in generated lists.");
+        }
 
 
         $installercard = new InstallerCard();

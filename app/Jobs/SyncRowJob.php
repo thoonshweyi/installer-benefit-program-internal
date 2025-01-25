@@ -39,6 +39,7 @@ class SyncRowJob implements ShouldQueue
     {
         // dd($this->row->toArray());
         $connection = "cloudpgsql"; // Assuming `db_connection_name` is defined in the Branch model
+
         // try {
             $operationSuccess = false;
 

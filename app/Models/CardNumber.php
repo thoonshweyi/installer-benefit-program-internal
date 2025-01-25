@@ -15,4 +15,9 @@ class CardNumber extends Model
         'card_number_generator_uuid',
     ];
 
+
+    public function cardnumbergenerator(){
+        return $this->belongsTo(CardNumberGenerator::class,"card_number_generator_uuid","uuid");
+    }
+
 }

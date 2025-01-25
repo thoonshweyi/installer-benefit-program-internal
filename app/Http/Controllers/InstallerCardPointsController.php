@@ -242,7 +242,9 @@ class InstallerCardPointsController extends Controller
                 'buy_date'=>$buy_date,
                 'gbh_customer_id'=>$gbh_customer_id,
                 'sale_cash_document_id'=>$sale_cash_document_id,
-                'branch_code'=>$branch_code
+                'branch_code'=>$branch_code,
+                // 'created_at' => now(), // Ensure created_at is explicitly set
+                // 'updated_at' => now(),
             ]);
             dispatch(new SyncRowJob("collection_transactions","insert",$collectiontransaction));
 
@@ -413,7 +415,9 @@ class InstallerCardPointsController extends Controller
                     'redemption_date' => now(),
                     'requester' => $installercard->fullname,
                     'prepare_by' => $user->uuid,
-                    'nature'=>"normal"
+                    'nature'=>"normal",
+                    // 'created_at' => now(), // Ensure created_at is explicitly set
+                    // 'updated_at' => now(),
                 ]);
                 dispatch(new SyncRowJob("redemption_transactions","insert",$transaction));
 

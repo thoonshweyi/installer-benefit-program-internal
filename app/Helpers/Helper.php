@@ -2004,7 +2004,9 @@ function deductPreUsedPointsFromCard($card_number){
                 'redemption_date' => now(),
                 'requester' => $installercard->fullname,
                 'prepare_by' => $user->uuid,
-                'nature'=>"return deduct"
+                'nature'=>"return deduct",
+                // 'created_at' => now(), // Ensure created_at is explicitly set
+                // 'updated_at' => now(),
             ]);
             dispatch(new SyncRowJob("redemption_transactions","insert",$transaction));
 
@@ -2215,7 +2217,9 @@ function deductDoubleProfit($card_number,$collectiontransaction){
                     'redemption_date' => now(),
                     'requester' => $installercard->fullname,
                     'prepare_by' => $user->uuid,
-                    'nature'=>"double profit deduct"
+                    'nature'=>"double profit deduct",
+                    // 'created_at' => now(), // Ensure created_at is explicitly set
+                    // 'updated_at' => now(),
                 ]);
                 dispatch(new SyncRowJob("redemption_transactions","insert",$transaction));
 
