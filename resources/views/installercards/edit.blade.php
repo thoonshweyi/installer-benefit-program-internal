@@ -8,7 +8,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <div class="header-title">
-                            <h4 class="card-title">Edit Installer Card</h4>
+                            <h4 class="card-title">Edit Installer Card : {{ $installercard->card_number  }}</h4>
                         </div>
                     </div>
                     @if (count($errors) > 0)
@@ -44,15 +44,23 @@
                                 </li>
 
                                 <li class="nav-item">
-                                    <button type="button" id="autoclick" class="tablinks" onclick="gettab(event,'history')">History</button>
+                                    <button type="button" class="tablinks" onclick="gettab(event,'history')">History</button>
+                                </li>
+
+                                <li class="nav-item">
+                                    <button type="button" class="tablinks" onclick="gettab(event,'accountinfo')">Account Info</button>
                                 </li>
                                 @can('transfer-installer-card')
                                     @if($installercard->isTransferrable())
                                     <li class="nav-item">
-                                        <button type="button" id="autoclick" class="tablinks" onclick="gettab(event,'transfer')">Transfer</button>
+                                        <button type="button" class="tablinks" onclick="gettab(event,'transfer')">Transfer</button>
                                     </li>
                                     @endif
                                 @endcan
+
+                                <li class="nav-item">
+                                    <button type="button" class="tablinks" onclick="gettab(event,'pointadjust')">Point Adjust</button>
+                                </li>
                             </ul>
 
                             <div class="tab-content">
@@ -475,10 +483,7 @@
 
                                  </div>
 
-                                @can('transfer-installer-card')
-                                @if($installercard->isTransferrable())
-                                <div id="transfer" class="tab-pane">
-                                    <h1>Transfer</h1>
+                                <div id="accountinfo" class="tab-pane">
                                     <div class="row">
 
                                         <div class="col-lg-4">
@@ -531,6 +536,15 @@
                                             </div>
 
                                         </div>
+
+                                    </div>
+                                </div>
+
+                                @can('transfer-installer-card')
+                                @if($installercard->isTransferrable())
+                                <div id="transfer" class="tab-pane">
+                                    <h1>Transfer</h1>
+                                    <div class="row">
 
                                         <div class="col-lg-4">
                                             <form id="transferform" action="{{ route('installercards.transfer',$installercard->card_number) }}" method="POST" enctype="multipart/form-data">
@@ -586,7 +600,64 @@
                                 @endif
                                 @endcan
 
-                            </div>
+                                <div id="pointadjust" class="tab-pane">
+                                    <h1>Point Adjust</h1>
+
+                                    <form id="creaditpointadjustform" action="{{ route('creditpointadjusts.store') }}" method="POST">
+                                        @csrf
+                                        <div class="row">
+                                            {{-- <div class="col-lg-4">
+                                                <div class="form-group">
+                                                    <label for="">Type</label>
+                                                    <select name="type" id="type" class="form-control">
+                                                        <option value="1" selected>Credit Refund</option>
+                                                    </select>
+                                                </div>
+                                            </div> --}}
+                                            <div class="col-lg-4">
+                                                <div class="form-group">
+                                                    <label for="">Reason</label>
+                                                    <select name="reason" id="reason" class="form-control">
+                                                        <option value="Mobile Banking Transfer" selected>Mobile Banking Transfer</option>
+                                                        <option value="Mobile Banking Transfer" selected>Cash Receive</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div class="form-group">
+                                                    <label for="total_points_adjusted">Total Point Adjusted</label>
+                                                    <input type="text" name="total_points_adjusted" id="total_points_adjusted" class="form-control" readonly value="{{ abs($installercard->credit_points) }}"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div class="form-group">
+                                                    <label for="total_adjust_value_formatted">Total Amount Adjusted</label>
+                                                    <input type="text" name="total_adjust_value_formatted" id="total_adjust_value_formatted" class="form-control" readonly value="{{ number_format(abs($installercard->credit_amount),0,'.',',') }} MMK"/>
+                                                    <input type="hidden" name="total_adjust_value" id="total_adjust_value" class="form-control" readonly value="{{ abs($installercard->credit_amount) }}"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 mb-2">
+                                                <label for="remark">Remark</label>
+                                                <textarea name="remark" id="remark" class="form-control" rows="4" placeholder="Write Something....">
+
+                                                </textarea>
+                                            </div>
+
+                                            <div class="col-md-12">
+                                                <button type="button" id="back-btn" class="btn btn-warning mr-2" onclick="window.history.back();">Back</button>
+                                                <button type="submit" class="btn btn-primary" id="">Send</button>
+                                            </div>
+                                            <input type="hidden" name="card_number" id="card_number" class="card_number" value="{{ $installercard->card_number }}"/>
+
+                                        </div>
+
+
+                                    </form>
+
+
+                                 </div>
+
+                                </div>
                         </div>
 
 
@@ -1241,6 +1312,28 @@
             }
           });
 
+
+
+    });
+
+
+
+    document.getElementById('creaditpointadjustform').addEventListener("submit",function(e){
+        e.preventDefault();
+
+        Swal.fire({
+            title: "Are you sure you want to send credit point adjust request to BM?",
+            text: "BM will review your credit point adjust detail.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, send it!"
+            }).then((result) => {
+            if (result.isConfirmed) {
+                this.submit();
+            }
+        });
 
 
     });

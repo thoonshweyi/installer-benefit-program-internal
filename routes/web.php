@@ -36,6 +36,7 @@ use App\Http\Controllers\CCWinningChanceController;
 use App\Http\Controllers\PointPromotionsController;
 use App\Http\Controllers\SaleAmountChecksController;
 use App\Http\Controllers\CreateTicket\ClaimController;
+use App\Http\Controllers\CreditPointAdjustsController;
 use App\Http\Controllers\HomeownerInstallersController;
 use App\Http\Controllers\InstallerCardPointsController;
 use App\Http\Controllers\InstallerHomeownersController;
@@ -185,4 +186,13 @@ Route::group(['middleware' => ['auth','customauth.currentbranch']], function () 
     Route::get('/cardnumbergenerators/{uuid}/export',[CardNumberGeneratorsController::class,"export"])->name("cardnumbergenerators.export");
     Route::post("/cardnumbergenerators/{cardnumbergenerator}/approveCardNumberGenerator",[CardNumberGeneratorsController::class,'approveCardNumberGenerator'])->name('cardnumbergenerators.approveCardNumberGenerator');
     Route::post("/cardnumbergenerators/{cardnumbergenerator}/rejectCardNumberGenerator/{step}",[CardNumberGeneratorsController::class,'rejectCardNumberGenerator'])->name('cardnumbergenerators.rejectCardNumberGenerator');
+
+
+    Route::get("/creditpointadjusts",[CreditPointAdjustsController::class,'index'])->name('creditpointadjusts.index');
+    Route::post('/creditpointadjusts',[CreditPointAdjustsController::class,"store"])->name("creditpointadjusts.store");
+    Route::get("/creditpointadjusts/{creditpointadjust}",[CreditPointAdjustsController::class,'show'])->name('creditpointadjusts.show');
+    Route::get('/creditpointadjusts/{uuid}/edit',[CreditPointAdjustsController::class,"edit"])->name("creditpointadjusts.edit");
+    Route::post("/creditpointadjusts/{creditpointadjusts}/approvecreditpointadjustreq",[CreditPointAdjustsController::class,'approveCreditPointAdjustReq'])->name('creditpointadjusts.approveCreditPointAdjustReq');
+    Route::post("/creditpointadjusts/{creditpointadjusts}/rejectcreditpointadjustreq",[CreditPointAdjustsController::class,'rejectCreditPointAdjustReq'])->name('creditpointadjusts.rejectCreditPointAdjustReq');
+
 });
