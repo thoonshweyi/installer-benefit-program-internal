@@ -133,6 +133,8 @@ class RoleController extends Controller
             $installer_card_permission = Permission::where('group_name','installercard')->get();
             $collection_transaction_permission = Permission::where('group_name','collectiontransaction')->get();
             $redemption_transaction_permission = Permission::where('group_name','redemptiontransaction')->get();
+            $card_number_generator_permission = Permission::where('group_name','cardnumbergenerator')->get();
+            $credit_point_adjust_permission = Permission::where('group_name','creditpointadjust')->get();
 
 
             $rolePermissions = DB::table("role_has_permissions")->where("role_has_permissions.role_id",$id)
@@ -151,7 +153,9 @@ class RoleController extends Controller
                 'branch_permission',
                 'installer_card_permission',
                 'collection_transaction_permission',
-                'redemption_transaction_permission'
+                'redemption_transaction_permission',
+                'card_number_generator_permission',
+                'credit_point_adjust_permission'
             ));
         }catch (\Exception $e) {
             Log::debug($e->getMessage());

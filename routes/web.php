@@ -192,7 +192,7 @@ Route::group(['middleware' => ['auth','customauth.currentbranch']], function () 
     Route::post('/creditpointadjusts',[CreditPointAdjustsController::class,"store"])->name("creditpointadjusts.store");
     Route::get("/creditpointadjusts/{creditpointadjust}",[CreditPointAdjustsController::class,'show'])->name('creditpointadjusts.show');
     Route::get('/creditpointadjusts/{uuid}/edit',[CreditPointAdjustsController::class,"edit"])->name("creditpointadjusts.edit");
-    Route::post("/creditpointadjusts/{creditpointadjusts}/approvecreditpointadjustreq",[CreditPointAdjustsController::class,'approveCreditPointAdjustReq'])->name('creditpointadjusts.approveCreditPointAdjustReq');
-    Route::post("/creditpointadjusts/{creditpointadjusts}/rejectcreditpointadjustreq",[CreditPointAdjustsController::class,'rejectCreditPointAdjustReq'])->name('creditpointadjusts.rejectCreditPointAdjustReq');
+    Route::post("/creditpointadjusts/{creditpointadjust}/approvecreditpointadjustreq",[CreditPointAdjustsController::class,'approveCreditPointAdjustReq'])->name('creditpointadjusts.approveCreditPointAdjustReq');
+    Route::post("/creditpointadjusts/{creditpointadjust}/rejectcreditpointadjustreq",[CreditPointAdjustsController::class,'rejectCreditPointAdjustReq'])->name('creditpointadjusts.rejectCreditPointAdjustReq');
 
 });

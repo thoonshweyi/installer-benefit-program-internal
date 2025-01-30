@@ -19,7 +19,7 @@ class CreateCreditPointAdjustDetailsTable extends Migration
             $table->integer("points_adjusted");
             $table->decimal("amount_adjusted",19,2);
             $table->uuid("installer_card_point_uuid")->nullable();
-            $table->uuid("point_adjust_uuid");
+            $table->uuid("credit_point_adjust_uuid");
             $table->timestamps();
         });
     }

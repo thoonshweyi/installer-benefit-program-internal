@@ -149,7 +149,7 @@
                                             ($installercard->stage == "issued"? "<span class='badge bg-secondary'>$installercard->stage</span>" : ""
                                             ))) !!}
                                         </td>
-                                        <td>{{  \Carbon\Carbon::parse($installercard->issued_at)->format('d-m-Y h:m:s A') }}</td>
+                                        <td>{{  \Carbon\Carbon::parse($installercard->issued_at)->format('d-m-Y h:i:s A') }}</td>
                                         <td>{{ $installercard->branch->branch_name_eng }}</td>
                                         <td>{{ $installercard->user->name }}</td>
                                         @can('edit-installer-card')
@@ -163,7 +163,7 @@
                                             </div>
                                         </td>
                                         @endcan
-                                        <td>{{  \Carbon\Carbon::parse($installercard->updated_at)->format('d-m-Y h:m:s A') }}</td>
+                                        <td>{{  \Carbon\Carbon::parse($installercard->updated_at)->format('d-m-Y h:i:s A') }}</td>
 
 
 

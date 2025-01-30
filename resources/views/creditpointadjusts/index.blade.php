@@ -91,8 +91,8 @@
                                     <td>
                                         {{ $creditpointadjust->total_adjust_value }}
                                     </td>
-                                    <td>{{ $creditpointadjust->user->name  }}</td>
-                                    <td>{{  \Carbon\Carbon::parse($creditpointadjust->created_at)->format('d-m-Y h:m:s A') }}</td>
+                                    <td>{{ $creditpointadjust->prepareby->name  }}</td>
+                                    <td>{{  \Carbon\Carbon::parse($creditpointadjust->created_at)->format('d-m-Y h:i:s A') }}</td>
                                 </tr>
                             @endforeach
 

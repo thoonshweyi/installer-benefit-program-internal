@@ -23,13 +23,13 @@ class CreateCreditPointAdjustsTable extends Migration
             $table->decimal('total_adjust_value', 19, 2);
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->dateTime('adjust_date');
+            $table->uuid('prepare_by');
             $table->uuid('approved_by')->nullable();
             $table->dateTime("approved_date")->nullable();
             // $table->foreign('approved_by')->references('uuid')->on('users')->onDelete('cascade');
             $table->text('reason')->nullable();
             $table->text('remark')->nullable();
             $table->text('bm_remark')->nullable();
-            $table->uuid("user_uuid");
             $table->uuid("collection_transaction_uuid")->nullable();
             $table->timestamps();
         });

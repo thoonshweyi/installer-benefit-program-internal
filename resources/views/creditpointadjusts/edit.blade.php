@@ -34,7 +34,7 @@
                     <div class="card-body">
 
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-12 logo-container">
                                     <h4 class="mb-3 text-center text-primary">{{ $creditpointadjust->document_no }}
                                         {!! $creditpointadjust->status == "pending" ?
                                         "<span class='badge bg-warning'>$creditpointadjust->status</span>" :
@@ -42,10 +42,11 @@
                                         ($creditpointadjust->status == "rejected"? "<span class='badge bg-danger'>$creditpointadjust->status</span>" : ""
                                         )) !!}
                                     </h4>
+                                    <h5 class="text-center">Installer Card - {{ $creditpointadjust->installer_card_card_number }}</h5>
                                     <div class="d-flex justify-content-between font-weight-bold">
                                         <div class="d-flex flex-column">
                                             <span>Branch - {{ $creditpointadjust->branch->branch_name_eng }}</span>
-                                            <span>Date: {{  \Carbon\Carbon::parse($creditpointadjust->created_at)->format('d-m-Y h:m:s A') }}</span>
+                                            <span>Date: {{  \Carbon\Carbon::parse($creditpointadjust->created_at)->format('d-m-Y h:i:s A') }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -53,28 +54,29 @@
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label for="">Reason</label>
-                                        <select name="reason" id="reason" class="form-control">
-                                            <option value="Mobile Banking Transfer" selected>Mobile Banking Transfer</option>
-                                            <option value="Mobile Banking Transfer" selected>Cash Receive</option>
+                                        <select name="reason" id="reason" class="form-control" readonly>
+                                            <option value="" selected disabled>Choose Reason</option>
+                                            <option value="Mobile Banking Transfer">Mobile Banking Transfer</option>
+                                            <option value="Cash Receive" >Cash Receive</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label for="total_points_adjusted">Total Point Adjusted</label>
-                                        <input type="text" name="total_points_adjusted" id="total_points_adjusted" class="form-control" readonly value="{{ abs($installercard->credit_points) }}"/>
+                                        <input type="text" name="total_points_adjusted" id="total_points_adjusted" class="form-control" readonly value="{{ $creditpointadjust->total_points_adjusted }}"/>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label for="total_adjust_value_formatted">Total Amount Adjusted</label>
-                                        <input type="text" name="total_adjust_value_formatted" id="total_adjust_value_formatted" class="form-control" readonly value="{{ number_format(abs($installercard->credit_amount),0,'.',',') }} MMK"/>
-                                        <input type="hidden" name="total_adjust_value" id="total_adjust_value" class="form-control" readonly value="{{ abs($installercard->credit_amount) }}"/>
+                                        <input type="text" name="total_adjust_value_formatted" id="total_adjust_value_formatted" class="form-control" readonly value="{{ number_format(abs($creditpointadjust->total_adjust_value),0,'.',',') }} MMK"/>
+                                        <input type="hidden" name="total_adjust_value" id="total_adjust_value" class="form-control" readonly value="{{ $creditpointadjust->total_adjust_value }}"/>
                                     </div>
                                 </div>
                                 <div class="col-md-12 mb-2">
                                     <label for="remark">Remark</label>
-                                    <textarea name="remark" id="remark" class="form-control" rows="4" placeholder="Write Something....">
+                                    <textarea name="remark" id="remark" class="form-control" rows="4" placeholder="Write Something...." readonly>{{ $creditpointadjust->remark }}
 
                                     </textarea>
                                 </div>
@@ -82,44 +84,10 @@
 
 
 
-
-                        {{-- {{ dd(count($creditpointadjust->cardnumbers)) }} --}}
-                        {{-- @if(count($creditpointadjust->cardnumbers) > 0)
-                        <div class="col-lg-12 my-4">
-                            <div class="table-responsive rounded">
-                                <h5>Card Number</h5>
-
-                                @if(($creditpointadjust->isFinishedAuthUser() && $creditpointadjust->status === "approved") || $creditpointadjust->multipleExportUser())
-                                    <a href=" {{ route('creditpointadjusts.export',$creditpointadjust->uuid) }}" id="export-btn" class="btn btn-primary my-2">Export</a>
-                                @endif
-
-
-                                <table class="table mb-0 tbl-server-info" id="lucky_draw_list">
-                                    <thead class="bg-white text-uppercase">
-                                        <tr class="ligth ligth-data">
-                                            <th>No</th>
-                                            <th>Card Number</th>
-                                            <th>QR</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="ligth-body">
-                                        @foreach ($creditpointadjust->cardnumbers as $idx=>$cardnumber)
-                                        <tr>
-                                            <td>{{ ++$idx }}</td>
-                                            <td>{{ $cardnumber->card_number }}</td>
-                                            <td><img src="{{ asset($cardnumber->image) }}" alt=""></td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        @endif --}}
-
                         <div class="row">
                             @if($creditpointadjust->isApproveAuthUser() && $creditpointadjust->status == 'pending')
                             <div class="col-lg-12 mb-2">
-                                <form id="mkt-mgr-form" action="" method="POST" enctype="multipart/form-data">
+                                <form id="bm-form" action="" method="POST" enctype="multipart/form-data">
                                     @csrf
                                     <div class="row align-items-end">
                                         <div class="col-md-4">
@@ -129,10 +97,10 @@
                                             </div>
                                         </div>
                                         <div class="col-auto p-0">
-                                            <button  type="button" id="mkt-mgr-approve"class="btn btn-primary mr-2">Approve</button>
+                                            <button  type="button" id="bm-approve"class="btn btn-primary mr-2">Approve</button>
                                         </div>
                                         <div class="col-auto p-0">
-                                            <button type="button" id="mkt-mgr-reject" class="btn btn-danger mr-2">Reject</button>
+                                            <button type="button" id="bm-reject" class="btn btn-danger mr-2">Reject</button>
                                         </div>
                                         <div class="col-auto p-0">
                                             <button type="button" id="back-btn" class="btn btn-light" onclick="window.history.back();">Back</button>
@@ -173,11 +141,11 @@
 
                                 !!}
                                 @else
-                                        {!! "<span class='text-muted font-weight-normal roles'>(Marketing Manager)</span>" !!}
+                                        {!! "<span class='text-muted font-weight-normal roles'>(Branch Manager)</span>" !!}
                                 @endif
                                 <div class="d-flex flex-wrap ">
-                                    @if($creditpointadjust->mkt_mgr_remark)
-                                        <span class="font-weight-bold text-info">"</span> <span class="mx-1 text-info">{{  $creditpointadjust->mkt_mgr_remark }}</span> <span class="font-weight-bold text-info">"</span>
+                                    @if($creditpointadjust->bm_remark)
+                                        <span class="font-weight-bold text-info">"</span> <span class="mx-1 text-info">{{  $creditpointadjust->bm_remark }}</span> <span class="font-weight-bold text-info">"</span>
                                     @else
 
                                     @endif
@@ -204,13 +172,13 @@
 <script type="text/javascript">
 
     $(document).ready(function(){
-        $('#mkt-mgr-reject').click(function(e){
+        $('#bm-reject').click(function(e){
             {{-- console.log('hi'); --}}
             e.preventDefault();
 
             Swal.fire({
-                title: "Are you sure you want to reject card number generation request?",
-                text: "Card Numbers will be rejected",
+                title: "Are you sure you want to reject credit point adjust request",
+                text: "Credit point adjust request fill be rejected",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
@@ -218,21 +186,21 @@
                 confirmButtonText: "Yes, reject it!"
               }).then((result) => {
                 if (result.isConfirmed) {
-                    $('#mkt-mgr-form').attr('action',"{{ route('creditpointadjusts.rejectcreditpointadjust', ['creditpointadjust' => $creditpointadjust->uuid, 'step' => 'mkt-mgr']) }}");
-                    $('#mkt-mgr-form').submit();
+                    $('#bm-form').attr('action',"{{ route('creditpointadjusts.rejectCreditPointAdjustReq', ['creditpointadjust' => $creditpointadjust->uuid]) }}");
+                    $('#bm-form').submit();
                 }
               });
 
         });
 
 
-        $('#mkt-mgr-approve').click(function(e){
+        $('#bm-approve').click(function(e){
             {{-- console.log('hi'); --}}
             e.preventDefault();
 
             Swal.fire({
-                title: "Are you sure you want to approve card number generator request?",
-                text: "Card Numbers will be exported after your approval.",
+                title: "Are you sure you want to approve credit point adjust request?",
+                text: "Installer card will reduce credit point after your approval",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
@@ -240,8 +208,8 @@
                 confirmButtonText: "Yes, approve it!"
               }).then((result) => {
                 if (result.isConfirmed) {
-                    $('#mkt-mgr-form').attr('action',"{{ route('creditpointadjusts.approvecreditpointadjust',$creditpointadjust->uuid) }}");
-                    $('#mkt-mgr-form').submit();
+                    $('#bm-form').attr('action',"{{ route('creditpointadjusts.approveCreditPointAdjustReq',$creditpointadjust->uuid) }}");
+                    $('#bm-form').submit();
                 }
               });
 
@@ -266,6 +234,8 @@
         });
  --}}
 
+
+        $("#reason").val('{{ $creditpointadjust->reason }}')
 
     });
 

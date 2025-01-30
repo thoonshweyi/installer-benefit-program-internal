@@ -83,4 +83,6 @@ return [
     'card_number_generator_list'=>'ကတ်ထုတ်ယူမှု စာရင်း',
 
 
+    "credit_point_adjusts"=>"ကြိုသုံးပွိုင့်ချိန်ညှိခြင်းများ",
+    "credit_point_adjust_list"=>"ကြိုသုံးပွိုင့်ချိန်ညှိခြင်း စာရင်း"
 ];

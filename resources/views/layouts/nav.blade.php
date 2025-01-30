@@ -120,7 +120,7 @@
             {{-- @endcan --}}
 
 
-            {{-- @can('view-home-owner') --}}
+            @can('create-card-number-generator')
             <li class="{{ (strpos(Route::currentRouteName(), 'cardnumbergenerators.index') === 0)  ? 'active' : ''}}">
                 <a href="#new_cardnumbergenerator" class="text-wrap collapsed" data-toggle="collapse" aria-expanded="false">
                     {{-- <i class="fas fa-gifts"></i> --}}
@@ -149,7 +149,7 @@
                     {{-- @endcan --}}
                 </ul>
             </li>
-            {{-- @endcan --}}
+            @endcan
 
             @can('create-promotion')
             <li class=" ">
@@ -280,8 +280,25 @@
             @endcan
             {{-- <div class="dropdown-divider"></div> --}}
 
-            {{-- <li class="nav-item text-center text-primary fw-bold">Lucky Draw Menu</li> --}}
-
+            @can('view-credit-point-adjust')
+            <li class="{{ (strpos(Route::currentRouteName(), 'creditpointadjusts.edit') === 0) || (strpos(Route::currentRouteName(), 'creditpointadjusts.index') === 0) ? 'active' : ''}}">
+                <a href="#creditpointadjust" class="collapsed" data-toggle="collapse" aria-expanded="false">
+                    <i class="fas fa-sliders-h"></i>
+                    <span class="ml-4">{{__('nav.credit_point_adjusts')}}</span>
+                    <svg class="svg-icon iq-arrow-right arrow-active" width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="10 15 15 20 20 15"></polyline>
+                        <path d="M4 4h7a4 4 0 0 1 4 4v12"></path>
+                    </svg>
+                </a>
+                <ul id="creditpointadjust" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
+                    <li class="{{ (strpos(Route::currentRouteName(), 'creditpointadjusts.index') === 0)  ? 'active' : ''}}">
+                        <a href="{{route('creditpointadjusts.index')}}" class="svg-icon">
+                            <i class="las la-minus"></i><span> {{__('nav.credit_point_adjust_list')}}</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            @endcan
 
 
 

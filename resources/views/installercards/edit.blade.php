@@ -58,9 +58,11 @@
                                     @endif
                                 @endcan
 
+                                @if($installercard->status == '1')
                                 <li class="nav-item">
                                     <button type="button" class="tablinks" onclick="gettab(event,'pointadjust')">Point Adjust</button>
                                 </li>
+                                @endif
                             </ul>
 
                             <div class="tab-content">
@@ -79,7 +81,7 @@
                                             <div class="d-flex justify-content-between font-weight-bold">
                                                 <div class="d-flex flex-column">
                                                     <span>Branch - {{ $installercard->branch->branch_name_eng }}</span>
-                                                    <span>Date: {{  \Carbon\Carbon::parse($installercard->created_at)->format('d-m-Y h:m:s A') }}</span>
+                                                    <span>Date: {{  \Carbon\Carbon::parse($installercard->created_at)->format('d-m-Y h:i:s A') }}</span>
                                                     {{-- <span>Installer Name - {{ $collectiontransaction->installercard->fullname }}</span> --}}
                                                 </div>
                                             </div>
@@ -473,7 +475,7 @@
                                                         {{$homeownerinstallerhistory->user->name}}
                                                     </td>
                                                     <td class="text-left">
-                                                        {{  \Carbon\Carbon::parse($homeownerinstallerhistory->created_at)->format('d-m-Y h:m:s A') }}
+                                                        {{  \Carbon\Carbon::parse($homeownerinstallerhistory->created_at)->format('d-m-Y h:i:s A') }}
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -600,6 +602,7 @@
                                 @endif
                                 @endcan
 
+                                @if($installercard->status == '1')
                                 <div id="pointadjust" class="tab-pane">
                                     <h1>Point Adjust</h1>
 
@@ -617,9 +620,10 @@
                                             <div class="col-lg-4">
                                                 <div class="form-group">
                                                     <label for="">Reason</label>
-                                                    <select name="reason" id="reason" class="form-control">
-                                                        <option value="Mobile Banking Transfer" selected>Mobile Banking Transfer</option>
-                                                        <option value="Mobile Banking Transfer" selected>Cash Receive</option>
+                                                    <select name="reason" id="reason" class="form-control" readonly>
+                                                        <option value="" selected disabled>Choose Reason</option>
+                                                        <option value="Mobile Banking Transfer">Mobile Banking Transfer</option>
+                                                        <option value="Cash Receive" >Cash Receive</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -658,6 +662,7 @@
                                  </div>
 
                                 </div>
+                                @endif
                         </div>
 
 

@@ -18,6 +18,8 @@ return [
     'installer_card_permission'  => 'Installer Card Permission',
     'collection_transaction_permission' => 'Collection Transaction Permission',
     'redemption_transaction_permission' => 'Redemption Transaction Permission',
+    "card_number_generator_permission" => 'Card Number Generator Permission',
+    "credit_point_adjust_permission" => 'Credit Point Adjust Permission',
     'show_role' => 'Show Role',
     'role' => 'Role',
 ];

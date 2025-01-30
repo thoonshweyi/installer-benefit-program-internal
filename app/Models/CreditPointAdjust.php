@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CreditPointAdjust extends Model
 {
@@ -18,11 +19,12 @@ class CreditPointAdjust extends Model
         'total_adjust_value',
         'status',
         'adjust_date',
+        'prepare_by',
         'approved_by',
         "approved_date",
+        "reason",
         'remark',
         'bm_remark',
-        "user_uuid",
         "collection_transaction_uuid",
     ];
 
@@ -46,8 +48,6 @@ class CreditPointAdjust extends Model
 
         $user = Auth::user();
 
-        // dd($user->roles);
-        // Check if the user's branch matches the transaction's branch
         $belongsToBranch = BranchUser::where('user_uuid', $user->uuid)
                             ->where('branch_id', $this->branch_id)
                             ->exists();
@@ -56,9 +56,8 @@ class CreditPointAdjust extends Model
         $isBranchManager = $user->roles()->whereIn('name', ['Branch Manager',"Super Admin"])->exists();
          // Return true if both conditions are met
          return $belongsToBranch && $isBranchManager;
-
-        //  Method 2
-        // *firstly find Aughorized user
-        // *compare with current user
     }
+
+
+
 }

@@ -14,6 +14,6 @@ class CreditPointAdjustDetail extends Model
         "points_adjusted",
         "amount_adjusted",
         "installer_card_point_uuid",
-        "point_adjust_uuid"
+        "credit_point_adjust_uuid"
     ];
 }

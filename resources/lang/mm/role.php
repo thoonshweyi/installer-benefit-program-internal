@@ -22,6 +22,8 @@ return [
     'installer_card_permission'  => 'အထူးဖောက်သည်ကတ်များနှင့်ဆိုင်သော လုပ်ပိုင်ခွင့်များ',
     'collection_transaction_permission'  => 'ပွိုင့်စုလက်ခံများနှင့်ဆိုင်သော လုပ်ပိုင်ခွင့်များ',
     'redemption_transaction_permission'  => 'ပွိုင့်ထုတ်ပေးချေမှုများနှင့်ဆိုင်သော လုပ်ပိုင်ခွင့်များ',
+    "card_number_generator_permission" => 'ကတ်ထုတ်ယူမှုများနှင့်ဆိုင်သော လုပ်ပိုင်ခွင့်များ',
+    "credit_point_adjust_permission" => 'ကြိုသုံးပွိုင့်ချိန်ညှိခြင်းနှင့်ဆိုင်သော လုပ်ပိုင်ခွင့်များ',
     'show_role' => 'ရာထူးအကြောင်း',
     'role' => 'ရာထူး',
 ];

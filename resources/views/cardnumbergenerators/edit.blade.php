@@ -48,7 +48,7 @@
                                     <div class="d-flex justify-content-between font-weight-bold">
                                         <div class="d-flex flex-column">
                                             <span>Branch - {{ $cardnumbergenerator->branch->branch_name_eng }}</span>
-                                            <span>Date: {{  \Carbon\Carbon::parse($cardnumbergenerator->created_at)->format('d-m-Y h:m:s A') }}</span>
+                                            <span>Date: {{  \Carbon\Carbon::parse($cardnumbergenerator->created_at)->format('d-m-Y h:i:s A') }}</span>
                                             {{-- <span>Installer Name - {{ $collectiontransaction->installercard->fullname }}</span> --}}
                                         </div>
                                     </div>

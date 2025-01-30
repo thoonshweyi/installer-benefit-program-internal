@@ -133,7 +133,7 @@
                                             ))) !!}
                                         </td>
                                         <td>{{ $cardnumbergenerator->prepareby->name  }}</td>
-                                        <td>{{  \Carbon\Carbon::parse($cardnumbergenerator->created_at)->format('d-m-Y h:m:s A') }}</td>
+                                        <td>{{  \Carbon\Carbon::parse($cardnumbergenerator->created_at)->format('d-m-Y h:i:s A') }}</td>
                                 </tr>
                             @endforeach
 

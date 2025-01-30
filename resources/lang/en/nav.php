@@ -79,4 +79,6 @@ return [
     'create_card_number_generators'=>'Create Card Number Generator',
     'card_number_generator_list'=>'Card Number Generator List',
 
+    "credit_point_adjusts"=>"Credit Point Adjusts",
+    "credit_point_adjust_list"=>"Credit Point Adjust List"
 ];

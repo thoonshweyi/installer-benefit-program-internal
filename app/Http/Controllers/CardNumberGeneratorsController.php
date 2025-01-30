@@ -15,6 +15,12 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class CardNumberGeneratorsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('permission:view-card-number-generator', ['only' => ['index']]);
+        $this->middleware('permission:create-card-number-generator', ['only' => ['create','store']]);
+    }
     public function index(Request $request){
         $cardnumbergenerators = CardNumberGenerator::orderBy('id','desc')->paginate(10);
         return view("cardnumbergenerators.index",compact("cardnumbergenerators"));
