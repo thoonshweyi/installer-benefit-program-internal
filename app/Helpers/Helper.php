@@ -1798,6 +1798,7 @@ function getCategoryGroupPointTotal($branch_id,$invoice_number,$pointperamount){
                 where aa.sale_cash_document_type_id in (1,5) and aa.sale_cash_document_status_id in ('1')
                 and  (bb.barcode_code not like 'GP%' or sale_price <='0' and diposit_type_id <> '3')
                 and aa.sale_cash_document_no in ('$invoice_number')
+                and sale_cash_document_type_id in ('5')
                 )bb
             LEFT JOIN temp_master_product pro on bb.barcode_codes=pro.barcode_code
             Left JOIN (SELECT distinct branch_code, branch_name FROM public.temp_master_product) as br on br.branch_code=bb.branch_code
@@ -1834,6 +1835,7 @@ function getCategoryGroupPointTotalReturned($branch_id,$invoice_number,$pointper
                 where aa.sale_cash_document_type_id in (1,5) and aa.sale_cash_document_status_id in ('1','5')
                 and  (bb.barcode_code not like 'GP%' or sale_price <='0' and diposit_type_id <> '3')
                 and aa.sale_cash_document_no in ('$invoice_number')
+                and sale_cash_document_type_id in ('5')
                 )bb
             LEFT JOIN temp_master_product pro on bb.barcode_codes=pro.barcode_code
             Left JOIN (SELECT distinct branch_code, branch_name FROM public.temp_master_product) as br on br.branch_code=bb.branch_code

@@ -206,10 +206,10 @@ class InstallerCardPointsController extends Controller
                 $scannabledate = Carbon::now()->subDays(14);
                 // $scannabledate = Carbon::now()->subMonths(3);
                 // dd($scannabledate);
-                // if (!$dateInstance->greaterThanOrEqualTo($scannabledate)) {
-                //     // dd('not available');
-                //     return redirect()->route('installercardpoints.detail', $card_number)->with("error", "Invoice is not within scannable date of within 14 days.");
-                // }
+                if (!$dateInstance->greaterThanOrEqualTo($scannabledate)) {
+                    // dd('not available');
+                    return redirect()->route('installercardpoints.detail', $card_number)->with("error", "Invoice is not within scannable date of 14 days.");
+                }
                 // dd("collected");
             // End Invoice Date Checking
 
