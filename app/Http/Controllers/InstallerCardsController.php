@@ -54,7 +54,11 @@ class InstallerCardsController extends Controller
         $this->middleware('permission:transfer-installer-card', ['only' => ['transfer']]);
     }
     public function index(){
-        $installercards = InstallerCard::orderBy('id','desc')->paginate(10);
+        $branch_id = getCurrentBranch();
+
+        $installercards = InstallerCard::
+                            where('branch_id',$branch_id)
+                            ->orderBy('id','desc')->paginate(10);
 
 
         // **Preparation for multiple branch deployment
@@ -405,6 +409,7 @@ class InstallerCardsController extends Controller
         $querycard_number = $request->input("querycard_number");
         $querynrc = $request->input("querynrc");
         $queryphone = $request->input("queryphone");
+        $querystage = $request->input("querystage");
 
         $results = InstallerCard::query();
         // dd($results);
@@ -416,6 +421,9 @@ class InstallerCardsController extends Controller
         }
         if($queryphone){
             $results = $results->where("phone",$queryphone);
+        }
+        if($querystage){
+            $results = $results->where("stage",$querystage);
         }
         $installercards = $results->orderBy('id','desc')->paginate(10);
 

@@ -2538,3 +2538,29 @@ function randomstringgenerator($length){
     // dd($randomstring); // VJMD // 1XES
     return $randomstring;
 }
+
+function isApprovalProcessSuperAdmin(){
+    $user = Auth::user();
+    $user_uuid = $user->uuid;
+
+    $isBranchManager = $user->roles()->whereIn('name', ["Super Admin"])->exists();
+    return  $isBranchManager;
+}
+
+function isApprovalProcessBM(){
+    $user = Auth::user();
+    $user_uuid = $user->uuid;
+
+    $isBranchManager = $user->roles()->whereIn('name', ['Branch Manager'])->exists();
+    return  $isBranchManager;
+}
+
+
+function isApprovalProcessMktMgr(){
+    $user = Auth::user();
+    $user_uuid = $user->uuid;
+
+    $isMktManager = $user->roles()->whereIn('name', ['Marketing Manager'])->exists();
+    return  $isMktManager;
+}
+

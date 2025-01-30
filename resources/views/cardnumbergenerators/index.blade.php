@@ -51,33 +51,47 @@
                 <p>{{ $message }}</p>
             </div>
             @endif
-            {{-- <div class="col-lg-12 d-flex mb-2">
-                <div class="form-row col-md-2">
-                    <label>{{__('lucky_draw.name')}} </label>
-                    <input type="text" class="form-control" id="lucky_draw_name" value="">
-                </div>
-                <div class="form-row col-md-2">
-                    <label>{{__('lucky_draw.start_date')}} </label>
-                    <input type="date" class="form-control" id="start_date" value="">
-                </div>
-                <div class="form-row col-md-2">
-                    <label>{{__('lucky_draw.end_date')}} </label>
-                    <input type="date" class="form-control" id="end_date" value="">
-                </div>
-                <div class="form-row col-md-2">
-                    <label>{{__('lucky_draw.status')}} </label>
-                    <select id="lucky_draw_status" class="form-control ">
-                        <option value="1">Active</option>
-                        <option value="2">Inactive</option>
-                        <option value="3">Pending</option>
-                        <option value="0">All Status</option>
-                    </select>
-                </div>
-                <button id="search" class="btn btn-primary document_search mr-2">{{__('button.search')}}</button>
-                @can('export-document-admin')
-                <button id="document_export" class="btn btn-success">{{__('button.product_excel_export')}}</button>
-                @endcan
-            </div> --}}
+            <div class="col-lg-12 mb-2">
+                <form action="{{ route('cardnumbergenerators.search') }}" method="GET">
+                    <div class="row justify-content-end">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <input type="text" id="" class="form-control form-control-sm" name="docno" placeholder="Enter Document No" value="{{ request()->get('docno') }}"/>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <input type="{{ request()->get('from_date') ? 'date' : 'text'  }}" name="from_date" id="from_date" class="from_date form-control form-control-sm" placeholder="From Date: mm/dd/yyyy" onfocus="(this.type='date')" onchange='changeHandler(this)' value="{{ request()->get('from_date')}}"/>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <input type="{{ request()->get('to_date') ? 'date' : 'text'  }}" name="to_date" id="to_date" class="to_date form-control form-control-sm" placeholder="To Date: mm/dd/yyyy" onfocus="(this.type='date')" onchange="changeHandler(this)" value="{{ request()->get('to_date') }}">
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 mb-md-0 mb-2">
+                            <select name="querystatus" id="querystatus" class="form-control form-control-sm" value="{{ request()->get('querystatus')}}">
+                                <option value="" selected>Choose Status</option>
+                                <option value="pending" {{ request()->get('querystatus') === 'pending' ? "selected" : '' }}>Pending</option>
+                                <option value="approved" {{ request()->get('querystatus') === 'approved' ? "selected" : '' }}>Approved</option>
+                                <option value="rejected" {{ request()->get('querystatus') === 'rejected' ? "selected" : '' }}>Rejected</option>
+                                <option value="exported" {{ request()->get('querystatus') === 'exported' ? "selected" : '' }}>Exported</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" id="search-btn" class="btn btn-primary rounded">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            @if(count(request()->query()) > 0)
+                                <button type="button" id="btn-clear" class="btn btn-light" onclick="window.location.href = window.location.href.split('?')[0];"><i class="fas fa-sync-alt"></i></button>
+                            @endif
+                        </div>
+                    </div>
+                </form>
+            </div>
             <div class="col-lg-12 loader-container">
                 <div class="rounded mb-3 table-container">
                     <table class="table mb-0 tbl-server-info" id="">

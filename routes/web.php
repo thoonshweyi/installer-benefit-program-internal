@@ -186,6 +186,7 @@ Route::group(['middleware' => ['auth','customauth.currentbranch']], function () 
     Route::get('/cardnumbergenerators/{uuid}/export',[CardNumberGeneratorsController::class,"export"])->name("cardnumbergenerators.export");
     Route::post("/cardnumbergenerators/{cardnumbergenerator}/approveCardNumberGenerator",[CardNumberGeneratorsController::class,'approveCardNumberGenerator'])->name('cardnumbergenerators.approveCardNumberGenerator');
     Route::post("/cardnumbergenerators/{cardnumbergenerator}/rejectCardNumberGenerator/{step}",[CardNumberGeneratorsController::class,'rejectCardNumberGenerator'])->name('cardnumbergenerators.rejectCardNumberGenerator');
+    Route::get('/searchcardnumbergenerators',[CardNumberGeneratorsController::class,'search'])->name('cardnumbergenerators.search');
 
 
     Route::get("/creditpointadjusts",[CreditPointAdjustsController::class,'index'])->name('creditpointadjusts.index');
@@ -194,5 +195,6 @@ Route::group(['middleware' => ['auth','customauth.currentbranch']], function () 
     Route::get('/creditpointadjusts/{uuid}/edit',[CreditPointAdjustsController::class,"edit"])->name("creditpointadjusts.edit");
     Route::post("/creditpointadjusts/{creditpointadjust}/approvecreditpointadjustreq",[CreditPointAdjustsController::class,'approveCreditPointAdjustReq'])->name('creditpointadjusts.approveCreditPointAdjustReq');
     Route::post("/creditpointadjusts/{creditpointadjust}/rejectcreditpointadjustreq",[CreditPointAdjustsController::class,'rejectCreditPointAdjustReq'])->name('creditpointadjusts.rejectCreditPointAdjustReq');
+    Route::get('/searchcreditpointadjusts',[CreditPointAdjustsController::class,'search'])->name('creditpointadjusts.search');
 
 });

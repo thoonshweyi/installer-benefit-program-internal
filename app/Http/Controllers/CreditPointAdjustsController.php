@@ -280,4 +280,53 @@ class CreditPointAdjustsController extends Controller
         return redirect()->back();
 
     }
+
+    public function search(Request $request){
+        $querydocno = $request->docno;
+        $document_from_date     = $request->from_date;
+        $document_to_date       = $request->to_date;
+        $querystatus = $request->input("querystatus");
+
+        $results = CreditPointAdjust::query();
+        // dd($results);
+        if($querydocno){
+            $results = $results->where('document_no','LIKE','%'.$querydocno.'%');
+        }
+        if($querystatus){
+            $results = $results->where("status",$querystatus);
+        }
+        if (!empty($document_from_date) || !empty($document_to_date)) {
+            if($document_from_date === $document_to_date)
+            {
+                $results = $results->whereDate('created_at', $document_from_date);
+            }
+            else
+            {
+
+                if($document_from_date && $document_to_date){
+                    $from_date = Carbon::parse($document_from_date);
+                    $to_date = Carbon::parse($document_to_date)->endOfDay();
+                    $results = $results->whereBetween('created_at', [$from_date , $to_date]);
+                }
+                if($document_from_date)
+                {
+                    $from_date = Carbon::parse($document_from_date);
+                    $results = $results->whereDate('created_at', ">=",$from_date);
+                }
+                if($document_to_date)
+                {
+                    $to_date = Carbon::parse($document_to_date)->endOfDay();
+                    $results = $results->whereDate('created_at',"<=", $to_date);
+                }
+
+            }
+        }
+
+
+        $branch_id = getCurrentBranch();
+        $creditpointadjusts = $results->where('branch_id',$branch_id)->paginate(10);
+        // dd($results);
+
+        return view('creditpointadjusts.index',compact("creditpointadjusts"));
+    }
 }

@@ -13,17 +13,34 @@
             </div>
 
 
-            {{-- <div class="col-lg-12 mb-2">
+            <div class="col-lg-12 mb-2">
                 <form action="{{ route('creditpointadjusts.search') }}" method="GET">
                     <div class="row justify-content-end">
-                        <div class="col-md-2 mb-md-0 mb-2">
-                            <input type="text" name="querycard_number" id="inscardnumber" class="form-control form-control-sm" placeholder="Enter Installer Card Number" value="{{ request()->get('querycard_number') }}">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <input type="text" id="" class="form-control form-control-sm" name="docno" placeholder="Enter Document No" value="{{ request()->get('docno') }}"/>
+                            </div>
                         </div>
-                        <div class="col-md-2 mb-md-0 mb-2">
-                            <input type="text" name="querynrc" id="querynrc" class="form-control form-control-sm" placeholder="Enter NRC Number" value="{{ request()->get('querynrc') }}"/>
+
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <input type="{{ request()->get('from_date') ? 'date' : 'text'  }}" name="from_date" id="from_date" class="from_date form-control form-control-sm" placeholder="From Date: mm/dd/yyyy" onfocus="(this.type='date')" onchange='changeHandler(this)' value="{{ request()->get('from_date')}}"/>
+                            </div>
                         </div>
+
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <input type="{{ request()->get('to_date') ? 'date' : 'text'  }}" name="to_date" id="to_date" class="to_date form-control form-control-sm" placeholder="To Date: mm/dd/yyyy" onfocus="(this.type='date')" onchange="changeHandler(this)" value="{{ request()->get('to_date') }}">
+                            </div>
+                        </div>
+
                         <div class="col-md-2 mb-md-0 mb-2">
-                            <input type="text" name="queryphone" id="queryphone" class="form-control form-control-sm" placeholder="Enter Phone Number" value="{{ request()->get('queryphone') }}"/>
+                            <select name="querystatus" id="querystatus" class="form-control form-control-sm" value="{{ request()->get('querystatus')}}">
+                                <option value="" selected>Choose Status</option>
+                                <option value="pending" {{ request()->get('querystatus') === 'pending' ? "selected" : '' }}>Pending</option>
+                                <option value="approved" {{ request()->get('querystatus') === 'approved' ? "selected" : '' }}>Approved</option>
+                                <option value="rejected" {{ request()->get('querystatus') === 'rejected' ? "selected" : '' }}>Rejected</option>
+                            </select>
                         </div>
                         <div class="col-auto">
                             <button type="submit" id="search-btn" class="btn btn-primary rounded">
@@ -35,7 +52,7 @@
                         </div>
                     </div>
                 </form>
-            </div> --}}
+            </div>
             <hr/>
             @if ($message = Session::get('error'))
             <div class="alert alert-danger">

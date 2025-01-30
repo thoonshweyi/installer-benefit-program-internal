@@ -33,6 +33,14 @@
                         <div class="col-md-2 mb-md-0 mb-2">
                             <input type="text" name="queryphone" id="queryphone" class="form-control form-control-sm" placeholder="Enter Phone Number" value="{{ request()->get('queryphone') }}"/>
                         </div>
+                        <div class="col-md-2 mb-md-0 mb-2">
+                            <select name="querystage" id="querystage" class="form-control form-control-sm" value="{{ request()->get('querystage')}}">
+                                <option value="" selected>Choose Status</option>
+                                <option value="pending" {{ request()->get('querystage') === 'pending' ? "selected" : '' }}>Pending</option>
+                                <option value="approved" {{ request()->get('querystage') === 'approved' ? "selected" : '' }}>Approved</option>
+                                <option value="rejected" {{ request()->get('querystage') === 'rejected' ? "selected" : '' }}>Rejected</option>
+                            </select>
+                        </div>
                         <div class="col-auto">
                             <button type="submit" id="search-btn" class="btn btn-primary rounded">
                                 <i class="fas fa-search"></i>
@@ -196,6 +204,8 @@
 @section('js')
 <script type="text/javascript">
     $(document).ready(function(){
+        {{-- $('#search-btn').click(); --}}
+
         $('.delete-btns').click(function(e){
             {{-- console.log('hi'); --}}
             e.preventDefault();
@@ -349,6 +359,11 @@
                     previewimages(this,'.gallery');
             });
             {{-- End Preview Image --}}
+
+
+        @if(count(request()->query()) > 0)
+        {{--  --}}
+        @endif
     });
 </script>
 @endsection

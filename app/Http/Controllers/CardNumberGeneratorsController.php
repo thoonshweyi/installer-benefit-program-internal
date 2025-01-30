@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Branch;
 use App\Models\BranchUser;
 use App\Models\CardNumber;
@@ -22,7 +23,11 @@ class CardNumberGeneratorsController extends Controller
         $this->middleware('permission:create-card-number-generator', ['only' => ['create','store']]);
     }
     public function index(Request $request){
-        $cardnumbergenerators = CardNumberGenerator::orderBy('id','desc')->paginate(10);
+        $branch_id = getCurrentBranch();
+
+        $cardnumbergenerators = CardNumberGenerator::
+                                where('branch_id',$branch_id)
+                                ->orderBy('id','desc')->paginate(10);
         return view("cardnumbergenerators.index",compact("cardnumbergenerators"));
     }
     public function create(Request $request){
@@ -244,6 +249,57 @@ class CardNumberGeneratorsController extends Controller
 
         return redirect()->back();
 
+    }
+
+
+    public function search(Request $request){
+        $querydocno = $request->docno;
+        $querystage = $request->input("querystage");
+        $document_from_date     = $request->from_date;
+        $document_to_date       = $request->to_date;
+        $querystatus = $request->input("querystatus");
+
+        $results = CardNumberGenerator::query();
+        // dd($results);
+        if($querydocno){
+            $results = $results->where('document_no','LIKE','%'.$querydocno.'%');
+        }
+        if($querystatus){
+            $results = $results->where("status",$querystatus);
+        }
+        if (!empty($document_from_date) || !empty($document_to_date)) {
+            if($document_from_date === $document_to_date)
+            {
+                $results = $results->whereDate('created_at', $document_from_date);
+            }
+            else
+            {
+
+                if($document_from_date && $document_to_date){
+                    $from_date = Carbon::parse($document_from_date);
+                    $to_date = Carbon::parse($document_to_date)->endOfDay();
+                    $results = $results->whereBetween('created_at', [$from_date , $to_date]);
+                }
+                if($document_from_date)
+                {
+                    $from_date = Carbon::parse($document_from_date);
+                    $results = $results->whereDate('created_at', ">=",$from_date);
+                }
+                if($document_to_date)
+                {
+                    $to_date = Carbon::parse($document_to_date)->endOfDay();
+                    $results = $results->whereDate('created_at',"<=", $to_date);
+                }
+
+            }
+        }
+
+
+        $branch_id = getCurrentBranch();
+        $cardnumbergenerators = $results->where('branch_id',$branch_id)->paginate(10);
+        // dd($results);
+
+        return view('cardnumbergenerators.index',compact("cardnumbergenerators"));
     }
 
 }

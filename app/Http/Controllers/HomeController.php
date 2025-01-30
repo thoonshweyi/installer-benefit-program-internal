@@ -12,11 +12,14 @@ use App\Models\BranchUser;
 use App\Models\ClaimHistory;
 use App\Models\TicketHeader;
 use Illuminate\Http\Request;
+use App\Models\InstallerCard;
 use App\Models\DocumentStatus;
 use App\Models\LuckyDrawBranch;
 use App\Models\Bago\BagoCustomer;
+use App\Models\CreditPointAdjust;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use App\Models\CardNumberGenerator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ShwePyiThar\ShwePyiTharCustomer;
@@ -44,38 +47,30 @@ class HomeController extends Controller
 
     public function index()
     {
-        // try {
-            $totalUser = User::whereHas('roles', function ($query) {
-                $query->where('name', '!=', 'Admin');
-            })->count();
+        $branch_id = getCurrentBranch();
 
-            $promotionBranchs = $this->getActivePromotions();
+        $pending_installer_cards_count =  InstallerCard::
+                                            where('branch_id',$branch_id)
+                                            ->where('stage','pending')
+                                            ->orderBy('id','desc')->count();
 
-            // $totalExchangeDoc = $this->getTotalExchangeDocument();
 
-            // $completeReturnDoc = $this->getCompleteReturnDocument();
-            // $completeExchangeDoc = $this->getCompleteExchangeDocument();
-            // $overdueExchangeDoc = $this->getOverdueExchangeDocument();
-             // if(count($document_checks) != 0){
-            //     foreach ($document_checks as $document_check) {
-            //         $document = new DocumentController;
-            //         $return_document_doc_no = $document::generate_doc_no(1,date('Y-m-d H:i:s'));
-            //         Document::where('id', $document_check->id)->update([
-            //             'document_no' => $return_document_doc_no,
-            //             'document_type' =>  1,
-            //             'exchange_to_return' =>  date('Y-m-d H:i:s'),
-            //             ]
-            //         );
-            //     }
-            // }
-            // $totalRole = Role::count();
-            return view('home', compact('promotionBranchs'), compact('promotionBranchs'));
-        // } catch (\Exception $e) {
-        //     Log::debug($e->getMessage());
-        //     return redirect()
-        //         ->intended(route("login"))
-        //         ->with('error', 'Fail to View Home!');
-        // }
+        $pending_card_number_generator_count =  CardNumberGenerator::
+                                            where('branch_id',$branch_id)
+                                            ->where('status','pending')
+                                            ->orderBy('id','desc')->count();
+        // dd($pending_card_number_generator_count);
+        $pending_credit_point_adjust =  CreditPointAdjust::
+                                                where('branch_id',$branch_id)
+                                                ->where('status','pending')
+                                                ->orderBy('id','desc')->count();
+
+        return view('home', compact(
+            'pending_installer_cards_count',
+            'pending_card_number_generator_count',
+            'pending_credit_point_adjust'
+        ));
+
     }
 
     public function test()
@@ -129,7 +124,7 @@ class HomeController extends Controller
     public function findTodayTicket($promotion_uuid,$branch_id)
     {
         // try {
-            
+
             return $this->claim_history_connection()
             ->where('claim_histories.promotion_uuid', $promotion_uuid)
             ->join('ticket_headers', 'ticket_headers.uuid', 'claim_histories.ticket_header_uuid')
