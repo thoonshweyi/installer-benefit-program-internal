@@ -103,14 +103,15 @@
                             @endforeach
                         </tbody>
                     </table>
-                    <div class="d-flex justify-content-center">
-                        {{ $collectiontransactions->appends(request()->all())->links('pagination::bootstrap-4') }}
-                    </div>
+
                     <div class="myloader">
                         <div class="loader-item"></div>
                         <div class="loader-item"></div>
                         <div class="loader-item"></div>
                     </div>
+                </div>
+                <div class="d-flex justify-content-center">
+                    {{ $collectiontransactions->appends(request()->all())->links('pagination::bootstrap-4') }}
                 </div>
             </div>
         </div>

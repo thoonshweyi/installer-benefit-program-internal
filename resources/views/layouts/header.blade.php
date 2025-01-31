@@ -12,12 +12,32 @@
             <div class="iq-search-bar device-search">
 
             </div>
-            <div class="d-flex align-items-center" id="notification">
+
+            <div class="d-flex align-items-center w-100" id="notification">
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-label="Toggle navigation">
                     <i class="ri-menu-3-line"></i>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+                    <div class="flex-fill justify-content-center">
+                        <form action="" method="">
+                            <div class="row">
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                        <select name="branch_id" id="branch_id" class="form-control @error('branch_id') is-invalid @enderror">
+                                            <option selected disabled>Choose Branch</option>
+                                            {{-- @foreach ($branches as $branch) --}}
+                                                {{-- <option value="{{ $branch->branch_id }}">{{ $branch->branch_name_eng }}</option> --}}
+                                            {{-- @endforeach --}}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
                     <ul class="navbar-nav ml-auto navbar-list align-items-center">
+
 
                         <li class="nav-item nav-icon mx-2">{{Auth::user()->name}} @ {{ Auth::user()->branch->branch_name_eng }}</li>
 

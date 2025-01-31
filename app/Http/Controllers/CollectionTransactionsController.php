@@ -34,10 +34,19 @@ class CollectionTransactionsController extends Controller
     public function index(){
         $branch_id = getCurrentBranch();
 
-        $collectiontransactions = CollectionTransaction::
-                                where('branch_id',$branch_id)
-                                ->orderBy("created_at",'desc')
-                                ->paginate(10);
+        $user = Auth::user();
+        if($user->can("view-all-collection-transaction")){
+            $collectiontransactions = CollectionTransaction::
+                                    where('branch_id',$branch_id)
+                                    ->orderBy("created_at",'desc')
+                                    ->paginate(10);
+        }else{
+            $collectiontransactions = CollectionTransaction::
+                                        where('branch_id',$branch_id)
+                                        ->where('user_uuid',Auth()->user()->uuid)
+                                        ->orderBy("created_at",'desc')
+                                        ->paginate(10);
+        }
         return view("collectiontransactions.index",compact('collectiontransactions'));
     }
 
@@ -152,6 +161,8 @@ class CollectionTransactionsController extends Controller
         $document_from_date     = $request->from_date;
         $document_to_date       = $request->to_date;
 
+        $branch_id = getCurrentBranch();
+
         $results = CollectionTransaction::query();
         // dd($results);
         if($querydocno){
@@ -187,9 +198,15 @@ class CollectionTransactionsController extends Controller
             }
         }
 
+        $results = $results->where('branch_id',$branch_id);
+        $user = Auth::user();
+        if($user->can("view-all-collection-transaction")){
+            $collectiontransactions = $results->paginate(10);
+        }else{
+            $collectiontransactions = $results->where('user_uuid',Auth()->user()->uuid)
+                                        ->paginate(10);
+        }
 
-        $branch_id = getCurrentBranch();
-        $collectiontransactions = $results->where('branch_id',$branch_id)->paginate(10);
         // dd($results);
 
         return view('collectiontransactions.index',compact("collectiontransactions"));

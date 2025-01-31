@@ -22,29 +22,18 @@ class RedemptionTransactionsController extends Controller
     public function index(){
         $branch_id = getCurrentBranch();
 
-        $redemptiontransactions = RedemptionTransaction::
-                                where('branch_id',$branch_id)
-                                ->orderBy("created_at",'desc')->paginate(10);
 
-
-
-        // foreach($redemptiontransactions as $redemptiontransaction){
-        //     $preparebyUuid = $redemptiontransaction->prepare_by; // Single value, not a collection
-        //     $prepareByUser = User::where('uuid', $preparebyUuid)->first();
-        //     // Assign the user model to the `prepareby` attribute
-        //     $redemptiontransaction->prepareby = $prepareByUser;
-
-        //     $approvedbyUuid = $redemptiontransaction->approved_by; // Single value, not a collection
-        //     $approvedByUser = User::where('uuid', $approvedbyUuid)->first();
-        //     // Assign the user model to the `prepareby` attribute
-        //     $redemptiontransaction->approvedby = $approvedByUser;
-
-        //     $paidbybyUuid = $redemptiontransaction->paid_by; // Single value, not a collection
-        //     $paidbyByUser = User::where('uuid', $paidbybyUuid)->first();
-        //     // Assign the user model to the `prepareby` attribute
-        //     $redemptiontransaction->paidby = $paidbyByUser;
-        // }
-
+        $user = Auth::user();
+        if($user->can("view-all-redemption-transaction")){
+            $redemptiontransactions = RedemptionTransaction::
+                                        where('branch_id',$branch_id)
+                                        ->orderBy("created_at",'desc')->paginate(10);
+        }else{
+            $redemptiontransactions = RedemptionTransaction::
+                                        where('branch_id',$branch_id)
+                                        ->where('prepare_by',Auth()->user()->uuid)
+                                        ->orderBy("created_at",'desc')->paginate(10);
+        }
 
         return view("redemptiontransactions.index",compact('redemptiontransactions'));
     }
@@ -55,24 +44,6 @@ class RedemptionTransactionsController extends Controller
         $pointsredemptions = PointsRedemption::where("redemption_transaction_uuid",$uuid)->get();
         $redemptiontransactionfiles = RedemptionTransactionFile::where("redemption_transaction_uuid",$uuid)->get();
 
-        // **Preparation for multiple branch deployment
-        // Fetch the user who prepared the transaction
-        // $preparebyUuid = $redemptiontransaction->prepare_by; // Single value, not a collection
-        // $prepareByUser = User::where('uuid', $preparebyUuid)->first();
-        // // Assign the user model to the `prepareby` attribute
-        // $redemptiontransaction->prepareby = $prepareByUser;
-
-        // $approvedbyUuid = $redemptiontransaction->approved_by; // Single value, not a collection
-        // $approvedByUser = User::where('uuid', $approvedbyUuid)->first();
-        // // Assign the user model to the `prepareby` attribute
-        // $redemptiontransaction->approvedby = $approvedByUser;
-
-        // $paidbybyUuid = $redemptiontransaction->paid_by; // Single value, not a collection
-        // $paidbyByUser = User::where('uuid', $paidbybyUuid)->first();
-        // // Assign the user model to the `prepareby` attribute
-        // $redemptiontransaction->paidby = $paidbyByUser;
-
-        // dd($redemptiontransaction);
         return view("redemptiontransactions.show",compact('redemptiontransaction','pointsredemptions','redemptiontransactionfiles'));
     }
 
@@ -438,6 +409,8 @@ class RedemptionTransactionsController extends Controller
         $document_from_date     = $request->from_date;
         $document_to_date       = $request->to_date;
 
+        $branch_id = getCurrentBranch();
+
         $results = RedemptionTransaction::query();
         // dd($results);
         if($querydocno){
@@ -473,9 +446,15 @@ class RedemptionTransactionsController extends Controller
             }
         }
 
+        $results = $results->where('branch_id',$branch_id);
 
-        $branch_id = getCurrentBranch();
-        $redemptiontransactions = $results->where('branch_id',$branch_id)->paginate(10);
+        $user = Auth::user();
+        if($user->can("view-all-redemption-transaction")){
+            $redemptiontransactions = $results->paginate(10);
+        }else{
+            $redemptiontransactions = $results->where('prepare_by',Auth()->user()->uuid)
+                                    ->paginate(10);
+        }
         // dd($results);
 
         return view('redemptiontransactions.index',compact("redemptiontransactions"));

@@ -56,44 +56,17 @@ class InstallerCardsController extends Controller
     public function index(){
         $branch_id = getCurrentBranch();
 
-        $installercards = InstallerCard::
-                            where('branch_id',$branch_id)
-                            ->orderBy('id','desc')->paginate(10);
-
-
-        // **Preparation for multiple branch deployment
-        // Fetch related user UUIDs
-        // $userUuids = $installercards->pluck('user_uuid')->filter();
-        // // Fetch users from the local branch database
-        // $users = DB::table('users')
-        //     ->whereIn('uuid', $userUuids)
-        //     ->get()
-        //     ->keyBy('uuid'); // Index users by UUID for easy mapping
-        // // Map user details to installer cards
-        // $installercards->each(function ($installercard) use ($users) {
-        //     $installercard->users = $users->get($installercard->user_uuid);
-        // });
-        // dd($installercards[0]);
-
-
-         // Fetch all unique user UUIDs from installer cards
-        // $userUuids = $installercards->pluck('user_uuid')->filter()->unique();
-        // // Initialize an empty collection to store users
-        // $users = collect();
-        // $LDConnections = ['pgsql_lanthit', 'pgsql_ayetharyar', 'pgsql_eastdagon','pgsql_hlaingtharyar','pgsql_mawlamyine','pgsql_satsan','pgsql_tampawady','pgsql_terminalm','pgsql_theikpan','pgsql_southdagon','pgsql_bago','pgsql_shwepyithar']; // Add all branch DB names
-        // // Loop through each branch connection to fetch users
-        // foreach ($LDConnections as $connection) {
-        //     $branchUsers = DB::connection($connection)
-        //         ->table('users')
-        //         ->whereIn('uuid', $userUuids)
-        //         ->get();
-        //     $users = $users->merge($branchUsers); // Merge users from each branch
-        // }
-        // // Map user details to the installer cards
-        // $users = $users->keyBy('uuid'); // Index users by UUID for easy access
-        // $installercards->each(function ($installercard) use ($users) {
-        //     $installercard->users = $users->get($installercard->user_uuid);
-        // });
+        $user = Auth::user();
+        if($user->can("view-all-installer-card")){
+            $installercards = InstallerCard::
+            where('branch_id',$branch_id)
+            ->orderBy('id','desc')->paginate(10);
+        }else{
+            $installercards = InstallerCard::
+                    where('branch_id',$branch_id)
+                    ->where('user_uuid',Auth()->user()->uuid)
+                    ->orderBy('id','desc')->paginate(10);
+        }
 
         $previousUrl = url()->previous();
         $previousRoute = app('router')->getRoutes()->match(app('request')->create($previousUrl));
@@ -117,140 +90,152 @@ class InstallerCardsController extends Controller
         ]);
         // dd($request);
 
-        $prevmonths_sale_amt_limit = $this->getInstallerCriterias()["prevmonths_sale_amt_limit"];
-        $validatearrs = [
-            // "card_number" => [
-            //     "required",
-            //     function ($attribute, $value, $fail) {
-            //         // Check the centralized database for uniqueness
-            //         $exists = DB::connection('centralpgsql')
-            //             ->table('installer_cards')
-            //             ->where('card_number', $value)
-            //             ->exists();
 
-            //         if ($exists) {
-            //             $fail("The {$attribute} has already been taken in the centralized database.");
-            //         }
-            //     },
-            //     "min:10",
-            //     "max:10"
-            // ],
-            "card_number"=>"required|unique:installer_cards,card_number|min:10|max:10",
-
-            "fullname"=>"required",
-            "phone"=>"required",
-            "address"=>"required",
-            "gender"=>"required",
-            "dob"=>"required",
-            "nrc"=>"required",
-            'member_active'=>"required",
-            'customer_active'=>"required",
-            'customer_rank_id'=>"required",
-            "customer_barcode"=>"required",
-
-            "gbh_customer_id"=>"required",
-
-            // "prevmonths_sale_amount"=>"required|numeric|min:$prevmonths_sale_amt_limit",
-
-            "images" => "required|array",
-            "images.*"=>"mimes:jpg,jpeg,png,pdf|max:10240",
-        ];
+        \DB::beginTransaction();
+        try{
 
 
-        $user = Auth::user();
-        $user_id = $user->id;
-        $user_uuid = $user->uuid;
-        $branch_id = getCurrentBranch();
+            $prevmonths_sale_amt_limit = $this->getInstallerCriterias()["prevmonths_sale_amt_limit"];
+            $validatearrs = [
+                // "card_number" => [
+                //     "required",
+                //     function ($attribute, $value, $fail) {
+                //         // Check the centralized database for uniqueness
+                //         $exists = DB::connection('centralpgsql')
+                //             ->table('installer_cards')
+                //             ->where('card_number', $value)
+                //             ->exists();
 
-        if(!$user->can("create-installer-card")){
-            $validatearrs["prevmonths_sale_amount"] = "required|numeric|min:$prevmonths_sale_amt_limit";
-        }
+                //         if ($exists) {
+                //             $fail("The {$attribute} has already been taken in the centralized database.");
+                //         }
+                //     },
+                //     "min:10",
+                //     "max:10"
+                // ],
+                "card_number"=>"required|unique:installer_cards,card_number|min:10|max:10",
 
-        $request->validate($validatearrs);
+                "fullname"=>"required",
+                "phone"=>"required",
+                "address"=>"required",
+                "gender"=>"required",
+                "dob"=>"required",
+                "nrc"=>"required",
+                'member_active'=>"required",
+                'customer_active'=>"required",
+                'customer_rank_id'=>"required",
+                "customer_barcode"=>"required",
 
-        $approve_cardnumbers = CardNumber::whereHas("cardnumbergenerator",function($query){
-            $query->whereIn("status",["approved","exported"]);
-        })->pluck("card_number");
+                "gbh_customer_id"=>"required",
 
-        if(!in_array($request->card_number,$approve_cardnumbers->toArray())){
-            return redirect()->back()->with("error","Installer card number is not in generated lists.");
-        }
+                // "prevmonths_sale_amount"=>"required|numeric|min:$prevmonths_sale_amt_limit",
 
-
-        $installercard = new InstallerCard();
-        $installercard->card_number = $request->card_number;
-        $installercard->branch_id = $branch_id;
-
-        $installercard->fullname = $request->fullname;
-        $installercard->phone = $request->phone;
-        $installercard->address = $request->address;
-        $installercard->gender = $request->gender;
-        $installercard->dob = $request->dob;
-        $installercard->nrc = $request->nrc;
-        $installercard->passport = $request->passport;
-        $installercard->identification_card = $request->identification_card;
-        $installercard->member_active = $request->member_active;
-        $installercard->customer_active = $request->customer_active;
-        $installercard->customer_rank_id = $request->customer_rank_id;
-
-        $installercard->customer_barcode = $request->customer_barcode;
-
-        $installercard->titlename = $request->titlename;
-        $installercard->firstname = $request->firstname;
-        $installercard->lastnanme = $request->lastnanme;
-        $installercard->province_id = $request->province_id;
-        $installercard->amphur_id = $request->amphur_id;
-        $installercard->nrc_no = $request->nrc_no;
-        $installercard->nrc_name = $request->nrc_name;
-        $installercard->nrc_short = $request->nrc_short;
-        $installercard->nrc_number = $request->nrc_number;
-        $installercard->gbh_customer_id = $request->gbh_customer_id;
+                "images" => "required|array",
+                "images.*"=>"mimes:jpg,jpeg,png,pdf|max:10240",
+            ];
 
 
-        $installercard->totalpoints = 0;
-        $installercard->totalamount = 0;
-        $installercard->credit_points = 0;
-        $installercard->credit_amount = 0;
-        $installercard->issued_at = Carbon::now();
-        $installercard->user_uuid = $user_uuid;
-        $installercard->status = 0;
-        $installercard->save();
-        dispatch(new SyncRowJob("installer_cards","insert",$installercard));
+            $user = Auth::user();
+            $user_id = $user->id;
+            $user_uuid = $user->uuid;
+            $branch_id = getCurrentBranch();
 
-
-        // // Update Other Card Status as Inactive
-        // $otherinstallercards = InstallerCard::where('gbh_customer_id',$installercard->gbh_customer_id)->where("card_number","!=",$installercard->card_number)->get();
-        // foreach($otherinstallercards as $otherinstallercard){
-        //     // Update all matching rows' status to inactive (status = 0) in one query
-        //     $otherinstallercard->update([
-        //         'status' => 0
-        //     ]);
-        //     dispatch(new SyncRowJob("installer_cards","update",$otherinstallercard));
-        // }
-
-
-
-        // Multi Images Upload
-        if($request->hasFile('images')){
-            foreach($request->file("images") as $image){
-                 $installercardfile = new InstallerCardFile();
-                 $installercardfile->installer_card_card_number = $installercard->card_number;
-
-                 $file = $image;
-                 $fname = $file->getClientOriginalName();
-                 $imagenewname = $installercard['card_number'].$fname;
-                 $file->move(public_path('assets/img/installercards/'),$imagenewname);
-
-
-                 $filepath = 'assets/img/installercards/'.$imagenewname;
-                 $installercardfile->image = $filepath;
-
-                 $installercardfile->save();
+            if(!$user->can("create-installer-card")){
+                $validatearrs["prevmonths_sale_amount"] = "required|numeric|min:$prevmonths_sale_amt_limit";
             }
+
+            $request->validate($validatearrs);
+
+            $approve_cardnumbers = CardNumber::whereHas("cardnumbergenerator",function($query){
+                $query->whereIn("status",["approved","exported"]);
+            })->pluck("card_number");
+
+            if(!in_array($request->card_number,$approve_cardnumbers->toArray())){
+                return redirect()->back()->with("error","Installer card number is not in generated lists.");
+            }
+
+
+            $installercard = new InstallerCard();
+            $installercard->card_number = $request->card_number;
+            $installercard->branch_id = $branch_id;
+
+            $installercard->fullname = $request->fullname;
+            $installercard->phone = $request->phone;
+            $installercard->address = $request->address;
+            $installercard->gender = $request->gender;
+            $installercard->dob = $request->dob;
+            $installercard->nrc = $request->nrc;
+            $installercard->passport = $request->passport;
+            $installercard->identification_card = $request->identification_card;
+            $installercard->member_active = $request->member_active;
+            $installercard->customer_active = $request->customer_active;
+            $installercard->customer_rank_id = $request->customer_rank_id;
+
+            $installercard->customer_barcode = $request->customer_barcode;
+
+            $installercard->titlename = $request->titlename;
+            $installercard->firstname = $request->firstname;
+            $installercard->lastnanme = $request->lastnanme;
+            $installercard->province_id = $request->province_id;
+            $installercard->amphur_id = $request->amphur_id;
+            $installercard->nrc_no = $request->nrc_no;
+            $installercard->nrc_name = $request->nrc_name;
+            $installercard->nrc_short = $request->nrc_short;
+            $installercard->nrc_number = $request->nrc_number;
+            $installercard->gbh_customer_id = $request->gbh_customer_id;
+
+
+            $installercard->totalpoints = 0;
+            $installercard->totalamount = 0;
+            $installercard->credit_points = 0;
+            $installercard->credit_amount = 0;
+            $installercard->issued_at = Carbon::now();
+            $installercard->user_uuid = $user_uuid;
+            $installercard->status = 0;
+            $installercard->save();
+            dispatch(new SyncRowJob("installer_cards","insert",$installercard));
+
+
+            // // Update Other Card Status as Inactive
+            // $otherinstallercards = InstallerCard::where('gbh_customer_id',$installercard->gbh_customer_id)->where("card_number","!=",$installercard->card_number)->get();
+            // foreach($otherinstallercards as $otherinstallercard){
+            //     // Update all matching rows' status to inactive (status = 0) in one query
+            //     $otherinstallercard->update([
+            //         'status' => 0
+            //     ]);
+            //     dispatch(new SyncRowJob("installer_cards","update",$otherinstallercard));
+            // }
+
+
+
+            // Multi Images Upload
+            if($request->hasFile('images')){
+                foreach($request->file("images") as $image){
+                    $installercardfile = new InstallerCardFile();
+                    $installercardfile->installer_card_card_number = $installercard->card_number;
+
+                    $file = $image;
+                    $fname = $file->getClientOriginalName();
+                    $imagenewname = $installercard['card_number'].$fname;
+                    $file->move(public_path('assets/img/installercards/'),$imagenewname);
+
+
+                    $filepath = 'assets/img/installercards/'.$imagenewname;
+                    $installercardfile->image = $filepath;
+
+                    $installercardfile->save();
+                }
+            }
+            \DB::commit();
+            return redirect()->route('installercards.index')->with('success','New Installer Registered Successfully');
+
+
+        }catch(Exception $err){
+            \DB::rollback();
+
+            return redirect()->route('installercards.index')->with("error","There is an error in storing installer cards");
         }
 
-
-        return redirect()->route('installercards.index')->with('success','New Installer Registered Successfully');
     }
 
     // public function verifycustomer(Request $request){
@@ -411,6 +396,8 @@ class InstallerCardsController extends Controller
         $queryphone = $request->input("queryphone");
         $querystage = $request->input("querystage");
 
+        $branch_id = getCurrentBranch();
+
         $results = InstallerCard::query();
         // dd($results);
         if($querycard_number){
@@ -425,20 +412,17 @@ class InstallerCardsController extends Controller
         if($querystage){
             $results = $results->where("stage",$querystage);
         }
-        $installercards = $results->orderBy('id','desc')->paginate(10);
 
-        // Fetch related user UUIDs
-        $userUuids = $installercards->pluck('user_uuid')->filter();
-        // Fetch users from the local branch database
-        $users = DB::table('users')
-            ->whereIn('uuid', $userUuids)
-            ->get()
-            ->keyBy('uuid'); // Index users by UUID for easy mapping
+        $results = $results->where('branch_id',$branch_id);
+        $user = Auth::user();
+        if($user->can("view-all-installer-card")){
+            $installercards = $results->orderBy('id','desc')->paginate(10);
+        }else{
+            $installercards = $results
+                                ->where('user_uuid',Auth()->user()->uuid)
+                                ->orderBy('id','desc')->paginate(10);
+        }
 
-        // Map user details to installer cards
-        $installercards->each(function ($installercard) use ($users) {
-            $installercard->users = $users->get($installercard->user_uuid);
-        });
 
         return view('installercards.index',compact("installercards"));
     }

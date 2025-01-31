@@ -21,10 +21,19 @@ class CreditPointAdjustsController extends Controller
     public function index(){
         $branch_id = getCurrentBranch();
 
-        $creditpointadjusts = CreditPointAdjust::
-                                where('branch_id',$branch_id)
-                                ->orderBy("created_at",'desc')
-                                ->paginate(10);
+        $user = Auth::user();
+        if($user->can("view-all-redemption-transaction")){
+            $creditpointadjusts = CreditPointAdjust::
+                                    where('branch_id',$branch_id)
+                                    ->orderBy("created_at",'desc')
+                                    ->paginate(10);
+        }else{
+            $creditpointadjusts = CreditPointAdjust::
+                                    where('branch_id',$branch_id)
+                                    ->where('prepare_by',Auth()->user()->uuid)
+                                    ->orderBy("created_at",'desc')
+                                    ->paginate(10);
+        }
         return view("creditpointadjusts.index",compact('creditpointadjusts'));
     }
 
@@ -287,6 +296,8 @@ class CreditPointAdjustsController extends Controller
         $document_to_date       = $request->to_date;
         $querystatus = $request->input("querystatus");
 
+        $branch_id = getCurrentBranch();
+
         $results = CreditPointAdjust::query();
         // dd($results);
         if($querydocno){
@@ -322,9 +333,14 @@ class CreditPointAdjustsController extends Controller
             }
         }
 
-
-        $branch_id = getCurrentBranch();
-        $creditpointadjusts = $results->where('branch_id',$branch_id)->paginate(10);
+        $results = $results->where('branch_id',$branch_id);
+        $user = Auth::user();
+        if($user->can("view-all-redemption-transaction")){
+            $creditpointadjusts = $results->paginate(10);
+        }else{
+            $creditpointadjusts = $results->where('prepare_by',Auth()->user()->uuid)
+                                    ->paginate(10);
+        }
         // dd($results);
 
         return view('creditpointadjusts.index',compact("creditpointadjusts"));

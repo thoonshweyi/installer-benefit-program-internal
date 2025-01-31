@@ -632,7 +632,7 @@
                         if(prevmonths_sale_amount < prevmonths_sale_amt_limit){
                             Swal.fire({
                                 icon: "error",
-                                title: "Your total purchase must exceed 6 lakh to qualify for installer benefit.",
+                                title: "Your total purchase must exceed 10 lakh to qualify for installer benefit.",
                                 text: "Please add more phone no: to reach amount.",
                             });
                             inputField.val('')
@@ -711,7 +711,7 @@
             if(prevmonths_sale_amount < prevmonths_sale_amt_limit){
                 Swal.fire({
                     icon: "error",
-                    title: "Your total purchase must exceed 6 lakh to qualify for installer benefit.",
+                    title: "Your total purchase must exceed 10 lakh to qualify for installer benefit.",
                     text: "Please add more phone no: to reach amount.",
                 });
                 $(this).val('')
