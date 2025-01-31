@@ -146,6 +146,12 @@
             window.history.back();
         }); --}}
         // End Back Btn
+
+
+        $('#current_branch_id').change(function(){
+            console.log($(this).val());
+            $(this).closest('form').submit();
+        });
     </script>
     @yield('js')
   </body>

@@ -27,7 +27,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('loadData:cron')->everyFiveMinutes();
         // $schedule->command('inspire')->hourly();
         $schedule->command('points:deduct-expired')->timezone('Asia/Yangon')->everyFiveMinutes();
-        $schedule->command('sync:localtocloud')->timezone('Asia/Yangon')->everyFiveMinutes();
+        // $schedule->command('sync:localtocloud')->timezone('Asia/Yangon')->everyFiveMinutes();
     }
 
     /**

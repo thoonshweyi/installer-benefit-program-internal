@@ -75,6 +75,8 @@ Route::group(['middleware' => ['auth']], function () {
 Route::group(['middleware' => ['auth','customauth.currentbranch']], function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+    Route::post('/changecurrentbranch', [CustomAuthController::class, 'changeCurrentBranch'])->name('customauth.changeCurrentBranch');
+
 
     Route::get('lang/{locale}', [LocalizationController::class, 'index'])->name('lang');
     Route::get('/users/profile', [UserController::class, 'profile'])->name('user.profile');

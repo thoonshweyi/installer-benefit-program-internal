@@ -20230,3 +20230,14 @@ i {
         height: 1.5rem;
         border-width: 0.2em;
       }
+
+
+/* #notification{
+    width: auto !important;
+} */
+
+@media (min-width: 992px) {
+    #notification{
+        width: 100% !important;
+    }
+}

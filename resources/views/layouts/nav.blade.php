@@ -220,18 +220,17 @@
             @endcan
 
 
-            @can('notified-redemption-transaction')
+            {{-- @can('notified-redemption-transaction')
             <li class="{{ (strpos(Route::currentRouteName(), 'redemptiontransactions.approvalnotifications') === 0) ? 'active' : ''}}">
                 <a href="{{route('redemptiontransactions.approvalnotifications')}}" class="svg-icon">
                     <i class="fas fa-comments-dollar fa-2x"></i>
-                    {{-- <i class="fas fa-money-check-alt"></i> --}}
                     <span class="ml-4">{{__('nav.redemption_requests')}}</span>
                 </a>
                 @if(Auth::user()->unreadNotifications->count() > 0)
                 <span class="approvalnotibadges">{{ Auth::user()->unreadNotifications->count() }} +</span>
                 @endif
             </li>
-            @endcan
+            @endcan --}}
 
             @can('view-redemption-transaction')
             <li class="{{ (strpos(Route::currentRouteName(), 'redemptiontransactions.index') === 0) || (strpos(Route::currentRouteName(), 'redemptiontransactions.show') === 0) ? 'active' : ''}}">

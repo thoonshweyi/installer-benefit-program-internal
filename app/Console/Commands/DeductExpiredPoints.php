@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Carbon\Carbon;
+use App\Jobs\SyncRowJob;
 use App\Models\InstallerCard;
 use Illuminate\Console\Command;
 use App\Models\InstallerCardPoint;
@@ -77,8 +78,11 @@ class DeductExpiredPoints extends Command
 
             $installercard->update([
                 "totalpoints"=>  $installercard->totalpoints - $totalDedeductPoints,
-                "totalamount"=> $installercard->totalamount - $totalDeductAmount
+                "totalamount"=> $installercard->totalamount - $totalDeductAmount,
+                'expire_points'=> $installercard->totalpoints + $totalDedeductPoints,
+                'expire_amount'=> $installercard->expire_amount + $totalDeductAmount,
             ]);
+            dispatch(new SyncRowJob("installer_cards","update",$installercard));
         }
 
 

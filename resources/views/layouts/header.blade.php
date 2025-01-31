@@ -13,22 +13,29 @@
 
             </div>
 
-            <div class="d-flex align-items-center w-100" id="notification">
+            <div class="d-flex align-items-center w-lg-100" id="notification">
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-label="Toggle navigation">
                     <i class="ri-menu-3-line"></i>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
                     <div class="flex-fill justify-content-center">
-                        <form action="" method="">
+                        <form action="{{ route('customauth.changeCurrentBranch') }}" method="POST">
+                            @csrf
                             <div class="row">
                                 <div class="col-lg-2">
                                     <div class="form-group">
-                                        <select name="branch_id" id="branch_id" class="form-control @error('branch_id') is-invalid @enderror">
+                                        <?php
+                                                    $user = Auth::user();
+                                                    $user_uuid = $user->uuid;
+                                                    $userbranches = \App\Models\BranchUser::where("user_uuid",$user_uuid)->pluck("branch_id");
+                                                    $branches = \App\Models\Branch::whereIn("branch_id",$userbranches)->get();
+                                        ?>
+                                        <select name="branch_id" id="current_branch_id" class="form-control @error('branch_id') is-invalid @enderror">
                                             <option selected disabled>Choose Branch</option>
-                                            {{-- @foreach ($branches as $branch) --}}
-                                                {{-- <option value="{{ $branch->branch_id }}">{{ $branch->branch_name_eng }}</option> --}}
-                                            {{-- @endforeach --}}
+                                            @foreach ($branches as $branch)
+                                                <option value="{{ $branch->branch_id }}" {{ $branch->branch_id == getCurrentBranch() ? 'selected' : '' }}>{{ $branch->branch_name_eng }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>

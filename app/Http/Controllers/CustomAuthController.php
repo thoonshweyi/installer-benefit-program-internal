@@ -28,4 +28,17 @@ class CustomAuthController extends Controller
         $user->save();
         return redirect()->route('home');
     }
+
+
+    public function changeCurrentBranch(Request $request){
+        request()->validate([
+            'branch_id' => 'required',
+        ]);
+
+        $user = Auth::user();
+        $user_uuid = $user->uuid;
+        $user->branch_id = $request->branch_id;
+        $user->save();
+        return redirect()->back();
+    }
 }
