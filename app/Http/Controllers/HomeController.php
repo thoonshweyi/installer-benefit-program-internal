@@ -47,28 +47,57 @@ class HomeController extends Controller
 
     public function index()
     {
+
+        $user = Auth::user();
         $branch_id = getCurrentBranch();
 
-        $pending_installer_cards_count =  InstallerCard::
+        $installer_card_noti_count = 0;
+        $card_number_generator_noti_count = 0;
+        $credit_point_adjust_noti_count = 0;
+
+        $installer_card_search_url = null;
+        $credit_point_search_url = null;
+        $card_number_generator_search_url = null;
+
+        if ($user->hasRole('Branch Manager') || $user->hasRole('Super Admin')) {
+            $installer_card_noti_count = InstallerCard::
                                             where('branch_id',$branch_id)
                                             ->where('stage','pending')
                                             ->orderBy('id','desc')->count();
+            $installer_card_search_url = "/searchinstallercards?querystage=pending'";
 
-
-        $pending_card_number_generator_count =  CardNumberGenerator::
-                                            where('branch_id',$branch_id)
-                                            ->where('status','pending')
-                                            ->orderBy('id','desc')->count();
-        // dd($pending_card_number_generator_count);
-        $pending_credit_point_adjust =  CreditPointAdjust::
+            $credit_point_adjust_noti_count =  CreditPointAdjust::
                                                 where('branch_id',$branch_id)
                                                 ->where('status','pending')
                                                 ->orderBy('id','desc')->count();
+            $credit_point_search_url = "/searchcreditpointadjusts?querystatus=pending";
+        }
+
+        if ($user->hasRole('Marketing Manager') || $user->hasRole('Super Admin')) {
+            $card_number_generator_noti_count = CardNumberGenerator::
+                                                    where('branch_id',$branch_id)
+                                                    ->where('status','pending')
+                                                    ->orderBy('id','desc')->count();
+            $card_number_generator_search_url = "/searchcardnumbergenerators?querystatus=pending";
+
+        }
+
+        if ($user->hasRole('Marketing') || $user->hasRole('Super Admin')) {
+            $card_number_generator_noti_count = CardNumberGenerator::
+                                                    where('branch_id',$branch_id)
+                                                    ->where('status','approved')
+                                                    ->orderBy('id','desc')->count();
+            $card_number_generator_search_url = "/searchcardnumbergenerators?querystatus=approved";
+
+        }
 
         return view('home', compact(
-            'pending_installer_cards_count',
-            'pending_card_number_generator_count',
-            'pending_credit_point_adjust'
+            'installer_card_noti_count',
+            'card_number_generator_noti_count',
+            'credit_point_adjust_noti_count',
+            'installer_card_search_url',
+            'credit_point_search_url',
+            'card_number_generator_search_url',
         ));
 
     }

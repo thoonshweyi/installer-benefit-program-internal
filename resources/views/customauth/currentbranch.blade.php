@@ -78,7 +78,9 @@
                                   <img src="{{ asset('images/PRO-1-Global-Logo.png') }}" class="img-fluid image-right" alt="" style="width: 50%; margin-bottom: 10%;">
                                   <img src="{{ asset('images/logo.png') }}" class="img-fluid image-right" alt="" style="width: 50px; height: 50px; margin-bottom: 10%; position: absolute;right: 0;margin-right: 20px;">
                                 </div>
-                                <img src="{{ asset('images/login/login-image.gif') }}" class="img-fluid image-right" alt="">
+                                {{-- <img src="{{ asset('images/login/login-image.gif') }}" class="img-fluid image-right" alt=""> --}}
+                                <img src="{{ asset('images/sales-contract-terms-abstract-concept-illustration_335657-3940.jpg') }}" class="img-fluid image-right" alt="">
+
 
                            </div>
                         </div>

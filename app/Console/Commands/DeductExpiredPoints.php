@@ -54,9 +54,6 @@ class DeductExpiredPoints extends Command
                                     ->where("is_redeemed", "0")
                                     ->where("expiry_date", "<", Carbon::now())
                                     ->where('expire_deduction_date',NULL)
-                                    ->whereHas('collectiontransaction',function($query){
-                                        $query->where('status','open');
-                                    })
                                     ->orderBy("created_at", "asc")
                                     ->orderBy('id','asc')
                                     ->get();
@@ -70,8 +67,9 @@ class DeductExpiredPoints extends Command
                 $totalDeductAmount += $installercardpoint->amount_balance;
 
                 $installercardpoint->update([
-                    // 'points_balance'=>0,
-                    // 'amount_balance'=>0,
+                    'points_balance'=>0,
+                    'amount_balance'=>0,
+                    'is_redeemed'=>1,
                     'expire_deduction_date'=> now()
                 ]);
             }
@@ -79,7 +77,7 @@ class DeductExpiredPoints extends Command
             $installercard->update([
                 "totalpoints"=>  $installercard->totalpoints - $totalDedeductPoints,
                 "totalamount"=> $installercard->totalamount - $totalDeductAmount,
-                'expire_points'=> $installercard->totalpoints + $totalDedeductPoints,
+                'expire_points'=> $installercard->expire_points + $totalDedeductPoints,
                 'expire_amount'=> $installercard->expire_amount + $totalDeductAmount,
             ]);
             dispatch(new SyncRowJob("installer_cards","update",$installercard));

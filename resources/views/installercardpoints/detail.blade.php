@@ -68,14 +68,14 @@
                             <div class="col-md-3">
                                 <div class="card shadow p-3">
                                     <h5>Expired Point</h5>
-                                    <h2>{{ $expiredpoints ? $expiredpoints : 0 }}</h2>
+                                    <h2>{{ intval($installercard->expire_points) }}</h2>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="card shadow p-3">
                                     <h5>Expired Amount</h5>
                                     <div class="d-flex">
-                                        <h2 class="mr-1">{{ $expiredamounts ? number_format($expiredamounts,0,'.',',') : 0 }}</h2>
+                                        <h2 class="mr-1">{{ number_format($installercard->expire_amount,0,'.',',') }}</h2>
                                         <h5 class="align-self-end">MMK</h5>
                                     </div>
                                 </div>

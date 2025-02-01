@@ -31,15 +31,15 @@
 
 
             <div class="col-lg-3">
-                <a href="{{ isApprovalProcessBM() || isApprovalProcessSuperAdmin() ? url('/searchinstallercards?querystage=pending') : 'javascript:void(0)' }}">
+                <a href="{{ $installer_card_search_url ? url($installer_card_search_url) : 'javascript:void(0)' }}">
                     <div class="card bg-white border-primary position-relative">
                         <div class="card-body text-center">
                             <h5 class="">
                                 <i class="fas fa-id-card"></i>
                                 Installer Card
                             </h5>
-                            @if((isApprovalProcessBM()|| isApprovalProcessSuperAdmin()) && $pending_installer_cards_count != 0)
-                            <div class="dashboard-notis">{{ $pending_installer_cards_count }}+</div>
+                            @if($installer_card_noti_count != 0)
+                            <div class="dashboard-notis">{{ $installer_card_noti_count }}+</div>
                             @endif
                         </div>
                     </div>
@@ -48,15 +48,15 @@
             </div>
 
             <div class="col-lg-3">
-                <a href="{{ isApprovalProcessMktMgr() || isApprovalProcessSuperAdmin() ? url('/searchcardnumbergenerators?querystatus=pending') : 'javascript:void(0)' }}">
+                <a href="{{ $card_number_generator_search_url ? url($card_number_generator_search_url) : 'javascript:void(0)' }}">
                     <div class="card bg-white border-primary position-relative">
                         <div class="card-body text-center">
                             <h5 class="">
                                 <i class="fas fa-id-card"></i>
                                 Card Number Generator
                             </h5>
-                            @if((isApprovalProcessMktMgr() || isApprovalProcessSuperAdmin()) && $pending_card_number_generator_count != 0)
-                            <div class="dashboard-notis">{{ $pending_card_number_generator_count }}+</div>
+                            @if($card_number_generator_noti_count != 0)
+                            <div class="dashboard-notis">{{ $card_number_generator_noti_count }}+</div>
                             @endif
                         </div>
                     </div>
@@ -65,15 +65,15 @@
 
 
             <div class="col-lg-3">
-                <a href="{{ isApprovalProcessBM() || isApprovalProcessSuperAdmin() ? url('/searchcreditpointadjusts?querystatus=pending') : 'javascript:void(0)' }}">
+                <a href="{{ $credit_point_search_url ? url($credit_point_search_url) : 'javascript:void(0)' }}">
                     <div class="card bg-white border-primary position-relative">
                         <div class="card-body text-center">
                             <h5 class="">
                                 <i class="fas fa-sliders-h"></i>
                                 Credit Point Adjust
                             </h5>
-                            @if((isApprovalProcessBM()|| isApprovalProcessSuperAdmin()) && $pending_credit_point_adjust != 0)
-                            <div class="dashboard-notis">{{ $pending_credit_point_adjust }}+</div>
+                            @if($credit_point_adjust_noti_count != 0)
+                            <div class="dashboard-notis">{{ $credit_point_adjust_noti_count }}+</div>
                             @endif
                         </div>
                     </div>
