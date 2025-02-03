@@ -33,7 +33,7 @@
                     @endif
                     <div class="card-body">
 
-                        <form action="{{ route('cardnumbergenerators.store') }}" method="POST" enctype="multipart/form-data">
+                        <form id="cardnumbergenerator-form" action="{{ route('cardnumbergenerators.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
                                 <div class="col-md-4">
@@ -102,6 +102,18 @@
 <script type="text/javascript">
 
     $(document).ready(function(){
+        $("#cardnumbergenerator-form").submit(function(e){
+            {{-- e.preventDefault(); --}}
+            Swal.fire({
+                    title: "Processing....",
+                    // html: "I will close in <b></b> milliseconds.",
+                    text: "Please wait while we generate card numbers",
+                    allowOutsideClick:false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+            });
+        });
 
     });
 

@@ -1715,37 +1715,37 @@ function getCustomerInfoById($branch_id,$customer_barcode){
             $customermodel = \App\Models\POS101\Pos101GbhCustomer::class;
             break;
         case 2:
-            $customermodel = \App\Models\POS101\Pos102GbhCustomer::class;
+            $customermodel = \App\Models\POS102\Pos102GbhCustomer::class;
             break;
         case 3:
-            $customermodel = \App\Models\POS101\Pos103GbhCustomer::class;
+            $customermodel = \App\Models\POS103\Pos103GbhCustomer::class;
             break;
         case 9:
-            $customermodel = \App\Models\POS101\Pos104GbhCustomer::class;
+            $customermodel = \App\Models\POS104\Pos104GbhCustomer::class;
             break;
         case 10:
-            $customermodel = \App\Models\POS101\Pos105GbhCustomer::class;
+            $customermodel = \App\Models\POS105\Pos105GbhCustomer::class;
             break;
         case 11:
-            $customermodel = \App\Models\POS101\Pos106GbhCustomer::class;
+            $customermodel = \App\Models\POS106\Pos106GbhCustomer::class;
             break;
         case 19:
-            $customermodel = \App\Models\POS101\Pos107GbhCustomer::class;
+            $customermodel = \App\Models\POS107\Pos107GbhCustomer::class;
             break;
         case 21:
-            $customermodel = \App\Models\POS101\Pos108GbhCustomer::class;
+            $customermodel = \App\Models\POS108\Pos108GbhCustomer::class;
             break;
         case 27:
-            $customermodel = \App\Models\POS101\Pos112GbhCustomer::class;
+            $customermodel = \App\Models\POS112\Pos112GbhCustomer::class;
             break;
         case 28:
-            $customermodel = \App\Models\POS101\Pos113GbhCustomer::class;
+            $customermodel = \App\Models\POS113\Pos113GbhCustomer::class;
             break;
         case 30:
-            $customermodel = \App\Models\POS101\Pos114GbhCustomer::class;
+            $customermodel = \App\Models\POS114\Pos114GbhCustomer::class;
             break;
         case 23:
-            $customermodel = \App\Models\POS101\Pos110GbhCustomer::class;
+            $customermodel = \App\Models\POS110\Pos110GbhCustomer::class;
             break;
     }
 
@@ -2529,19 +2529,24 @@ function getCardPrefix($branch_id){
     return $prefix;
 }
 
-function randomstringgenerator($length){
+// function randomstringgenerator($length){
 
-    $characters = "0123456789"; // index 0 to 35
-    $characterlengts = strlen($characters);
-    // dd($characterlengts); // 36
+//     $characters = "0123456789"; // index 0 to 35
+//     $characterlengts = strlen($characters);
+//     // dd($characterlengts); // 36
 
-    $randomstring = "";
-    for($i=0 ; $i<$length; $i++){
-        $randomstring .=  $characters[rand(0,$characterlengts-1)];
-    }
+//     $randomstring = "";
+//     for($i=0 ; $i<$length; $i++){
+//         $randomstring .=  $characters[rand(0,$characterlengts-1)];
+//     }
 
-    // dd($randomstring); // VJMD // 1XES
-    return $randomstring;
+//     // dd($randomstring); // VJMD // 1XES
+//     return $randomstring;
+// }
+
+function randomstringgenerator($length) {
+    $randomnumber =  str_pad(random_int(0, pow(10, $length) - 1), $length, '0', STR_PAD_LEFT);
+    return $randomnumber;
 }
 
 function isApprovalProcessSuperAdmin(){

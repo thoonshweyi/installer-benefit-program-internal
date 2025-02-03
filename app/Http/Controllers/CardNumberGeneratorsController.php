@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Throwable;
 use Carbon\Carbon;
 use App\Models\Branch;
 use App\Models\BranchUser;
@@ -72,6 +73,7 @@ class CardNumberGeneratorsController extends Controller
 
             $cardnumbers = $this->generate_card_number($to_branch_id,$quantity);
             // dd($cardnumbers);
+            $savedFiles = []; // Store generated QR file paths
             foreach($cardnumbers as $cardnumber){
                 $cardnumberObj = new CardNumber();
                 $cardnumberObj->card_number = $cardnumber;
@@ -88,6 +90,7 @@ class CardNumberGeneratorsController extends Controller
                 }
                 // Save QR code image to the file path
                 file_put_contents($qr_file_path, $qrCode);
+                $savedFiles[] = $qr_file_path;
 
                 // Save cardnumberObj to the database
                 $cardnumberObj->image = $filepath;
@@ -98,8 +101,13 @@ class CardNumberGeneratorsController extends Controller
             \DB::commit();
             return redirect()->route('cardnumbergenerators.index')->with('success','New Cards Created Successfully');
 
-        }catch(Exception $err){
+        }catch(Throwable $err){
             \DB::rollback();
+            foreach ($savedFiles as $file) {
+                if (file_exists($file)) {
+                    unlink($file);
+                }
+            }
 
             return redirect()->route('pointpromos.index')->with("error","There is an error in creation Point Promotion");
         }
