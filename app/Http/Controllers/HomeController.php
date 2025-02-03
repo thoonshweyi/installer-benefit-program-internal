@@ -64,7 +64,7 @@ class HomeController extends Controller
                                             where('branch_id',$branch_id)
                                             ->where('stage','pending')
                                             ->orderBy('id','desc')->count();
-            $installer_card_search_url = "/searchinstallercards?querystage=pending'";
+            $installer_card_search_url = "/searchinstallercards?querystage=pending";
 
             $credit_point_adjust_noti_count =  CreditPointAdjust::
                                                 where('branch_id',$branch_id)
