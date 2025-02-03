@@ -2520,9 +2520,11 @@ function getPrevMonthsSaleAmounts($match_phones){
 
 function getCardPrefix($branch_id){
 
-    // $branch_code = Branch::where('branch_id',$branch_id)->first()->pluck('branch_code');
-    // dd($branch_code);
-    $prefix = "3".str_pad($branch_id, 2, '0', STR_PAD_LEFT);
+    $branch_code = Branch::where('branch_id',$branch_id)->first()->branch_code;
+    $last_two_branch_code = substr($branch_code, -2); // Get last two characters
+    // dd($last_two_branch_code);
+
+    $prefix = "3".str_pad($last_two_branch_code, 2, '0', STR_PAD_LEFT);
     // dd($prefix);
     return $prefix;
 }
