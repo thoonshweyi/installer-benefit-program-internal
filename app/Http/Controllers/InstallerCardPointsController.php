@@ -185,6 +185,8 @@ class InstallerCardPointsController extends Controller
                 return redirect()->route('installercardpoints.detail',$card_number)->with("error","Invalid Invoice Voucher.");
             }
 
+
+
             // Start Home Owner Checking
                 $homeowneruuids = HomeownerInstaller::where('installer_card_card_number',$card_number)->pluck('home_owner_uuid');
                 $homeowner_customer_barcodes = HomeOwner::whereIn('uuid',$homeowneruuids)->pluck('customer_barcode');
@@ -203,8 +205,8 @@ class InstallerCardPointsController extends Controller
             // Start Invoice Date Checking
                 $date = $inv_cat_grp_totals[0]->date; // Date String
                 $dateInstance = Carbon::parse($date);
-                $scannabledate = Carbon::now()->subDays(14);
-                // $scannabledate = Carbon::now()->subMonths(3);
+                // $scannabledate = Carbon::now()->subDays(14);
+                $scannabledate = Carbon::now()->subMonths(3)->firstOfMonth(); // Open invoice later than 11/1
                 // dd($scannabledate);
                 if (!$dateInstance->greaterThanOrEqualTo($scannabledate)) {
                     // dd('not available');
