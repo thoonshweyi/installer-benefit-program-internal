@@ -145,4 +145,13 @@ class InstallerCard extends Model
         return false;
 
     }
+
+
+    public function isAssigned(){
+        return HomeownerInstaller::where('installer_card_card_number',$this->card_number)->exists();
+    }
+
+    public function getHomeOwnerCount(){
+        return HomeownerInstaller::where('installer_card_card_number',$this->card_number)->count();
+    }
 }

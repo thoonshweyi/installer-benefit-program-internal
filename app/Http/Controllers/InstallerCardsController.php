@@ -746,6 +746,75 @@ class InstallerCardsController extends Controller
         return view("installercards.register",compact("prevmonths_sale_amt_limit"));
     }
 
+    // public function matchbysaleamount(Request $request){
+    //     // dd($request->match_phone);
+
+    //     $month_limit = 6;
+    //     $match_phones = $request->match_phones;
+    //     // dd($match_phones);
+    //     $filtered_match_phones = array_filter($match_phones, function ($value) {
+    //         return $value !== null && $value !== 0 && $value !== '';
+    //     });
+    //     $filtered_match_phones = array_unique($filtered_match_phones);
+    //     // dd($filtered_match_phones);
+    //     $prevmonths_sale_amount_arr = getPrevMonthsSaleAmounts($filtered_match_phones);
+    //     // dd(empty($prevmonths_sale_amount_arr));
+    //     $prevmonths_sale_amounts = !empty($prevmonths_sale_amount_arr) ? collect($prevmonths_sale_amount_arr) : collect();
+    //     $is_sale = count($prevmonths_sale_amounts) > 0;
+
+    //     $primary_result = 0;
+    //     $secondary_result1 = 0;
+    //     $secondary_result2 = 0;
+    //     $response_arr= [];
+    //     foreach($filtered_match_phones as $idx=>$filtered_match_phone){
+    //         if($idx == 0){
+    //             // dd(count($prevmonths_sale_amounts) > 0);
+    //             if($is_sale){
+    //                 // dd($prevmonths_sale_amounts);
+    //                 $primary_result =  $prevmonths_sale_amounts->where('mobile',$filtered_match_phone)->first();
+    //             }
+    //             $response_arr['primary_result'] = $primary_result;
+    //         }elseif($idx == 1){
+    //             if($is_sale){
+    //                 $secondary_result1 =  $prevmonths_sale_amounts->where('mobile',$filtered_match_phone)->first();
+    //             }
+    //             $response_arr['secondary_result1'] = $secondary_result1;
+    //         }elseif($idx == 2){
+    //             if($is_sale){
+    //                 $secondary_result2 = $prevmonths_sale_amounts->where('mobile',$filtered_match_phone)->first();
+    //             }
+    //             $response_arr['secondary_result2'] = $secondary_result2;
+    //         }
+    //     }
+
+
+    //     $totalsaleamount = $prevmonths_sale_amounts->sum('amnt');
+    //     // dd($totalsaleamount);
+    //     $branch_id = getCurrentBranch();
+    //     $user = Auth::user();
+    //     $user_uuid = $user->uuid;
+    //     $saleamountcheck = SaleAmountCheck::create([
+    //         'uuid' => (string) Str::uuid(),
+    //         'primary_phone'=> $filtered_match_phones[0],
+    //         'total_sale_amount'=> $totalsaleamount,
+    //         'branch_id'=> $branch_id,
+    //         'user_uuid'=> $user_uuid
+    //     ]);
+
+    //     foreach($prevmonths_sale_amounts as $prevmonths_sale_amount){
+    //         CusSaleAmounts::create([
+    //             'customer_barcode'=>  $prevmonths_sale_amount->customer_barcode,
+    //             'phone'=> $prevmonths_sale_amount->mobile,
+    //             'sale_amount'=> $prevmonths_sale_amount->amnt,
+    //             'sale_amount_check_uuid'=> $saleamountcheck->uuid
+    //         ]);
+    //     }
+
+
+    //     return response()->json(["data"=>$response_arr]);
+
+    // }
+
     public function matchbysaleamount(Request $request){
         // dd($request->match_phone);
 
@@ -788,7 +857,7 @@ class InstallerCardsController extends Controller
         }
 
 
-        $totalsaleamount = $prevmonths_sale_amounts->sum('amnt');
+        $totalsaleamount = $prevmonths_sale_amounts->sum('totalsaleamnt');
         // dd($totalsaleamount);
         $branch_id = getCurrentBranch();
         $user = Auth::user();
@@ -803,9 +872,9 @@ class InstallerCardsController extends Controller
 
         foreach($prevmonths_sale_amounts as $prevmonths_sale_amount){
             CusSaleAmounts::create([
-                'customer_barcode'=>  $prevmonths_sale_amount->customer_barcode,
+                'customer_barcode'=>  $prevmonths_sale_amount->custcode,
                 'phone'=> $prevmonths_sale_amount->mobile,
-                'sale_amount'=> $prevmonths_sale_amount->amnt,
+                'sale_amount'=> $prevmonths_sale_amount->totalsaleamnt,
                 'sale_amount_check_uuid'=> $saleamountcheck->uuid
             ]);
         }
@@ -814,6 +883,7 @@ class InstallerCardsController extends Controller
         return response()->json(["data"=>$response_arr]);
 
     }
+
 
     public function getInstallerCriterias(){
         $installer_criterias = ["prevmonths_sale_amt_limit"=>1000000];

@@ -42,7 +42,7 @@ class HomeOwnersCntroller extends Controller
             "address"=>"required",
             "gender"=>"required",
             "dob"=>"required",
-            "nrc"=>"required",
+            // "nrc"=>"required",
             'member_active'=>"required",
             'customer_active'=>"required",
             'customer_rank_id'=>"required",

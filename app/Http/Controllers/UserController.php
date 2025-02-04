@@ -125,7 +125,7 @@ class UserController extends Controller
                     ->make(true);
             }
             $branches = Branch::select('branch_id', 'branch_name_eng')
-                ->wherein('branch_id', [2, 11, 1, 3, 9, 19, 10, 21, 27, 28,30])
+                // ->wherein('branch_id', [2, 11, 1, 3, 9, 19, 10, 21, 27, 28,30])
                 ->get();
             $roles = Role::get();
             return view('users.index', compact('branches','roles'));

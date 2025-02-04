@@ -108,8 +108,9 @@ class CardNumberGeneratorsController extends Controller
                     unlink($file);
                 }
             }
+            throw $err;
 
-            return redirect()->route('pointpromos.index')->with("error","There is an error in creation Point Promotion");
+            return redirect()->route('pointpromos.index')->with("error","There is an error in creation Card Number Generator");
         }
     }
 

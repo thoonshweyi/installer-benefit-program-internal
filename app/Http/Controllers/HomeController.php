@@ -88,7 +88,6 @@ class HomeController extends Controller
                                                     ->where('status','approved')
                                                     ->orderBy('id','desc')->count();
             $card_number_generator_search_url = "/searchcardnumbergenerators?querystatus=approved";
-
         }
 
         return view('home', compact(

@@ -509,7 +509,7 @@
                     let prevmonths_sale_amount = 0;
                     for(key in responsedata){
                         let result = responsedata[key];
-                        let amnt =  result ? parseFloat(result.amnt) : parseFloat(0);
+                        let amnt =  result ? parseFloat(result.totalsaleamnt) : parseFloat(0);
                         let formattedamnt = amnt.toLocaleString();
 
                         console.log(amnt, typeof amnt);

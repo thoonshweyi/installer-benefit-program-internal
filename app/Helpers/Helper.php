@@ -2472,51 +2472,98 @@ function checkDoubleProfit($card_number,$collectiontransaction){
         return true;
 }
 
+// function getPrevMonthsSaleAmounts($match_phones){
+
+//     $db_ext = DB::connection('pro1208_pgsql');
+//     // $match_phones = (string) implode(", ", $match_phones);
+//     $match_phones = implode(", ", array_map(function ($phone) {
+//         return "'" . addslashes($phone) . "'";
+//     }, $match_phones));
+
+
+//     $cus_sale_amt = $db_ext->select(
+//         "SELECT customer_barcode,mobile,amnt FROM (
+// 			SELECT custcode,sum(amnt) as amnt FROM (
+// 			SELECT custcode,sum(sumgoodamnt) as amnt
+// 			FROM saledata.saleorderhd sohd
+// 			LEFT JOIN configure.setar_emcust cus on cus.custid=sohd.custid
+// 			WHERE docudate between '2024-01-01' and '2024-10-01' and docustatus <> 'C'
+// 			GROUP BY custcode
+
+// 			UNION ALL
+
+// 			SELECT custcode,sum(sumgoodamnt) as amnt
+// 			FROM  saledata.salecredithd sohd
+// 			LEFT JOIN configure.setar_emcust cus on cus.custid=sohd.custid
+// 			WHERE docudate between '2024-01-01' and '2024-10-01' and docustatus <> 'C'
+// 			GROUP BY custcode
+
+// 			UNION ALL
+
+// 			SELECT custcode,sum(-1*saleamnt) as amnt
+// 			FROM   saledata.creditnotehd cnhd
+// 			LEFT JOIN configure.setar_emcust cus on cus.custid=cnhd.custid
+// 			INNER JOIN saledata.creditnotedt cndt on cnhd.saleid= cndt.saleid
+// 			WHERE cnhd.docudate between '2024-01-01' and '2024-10-01' and docustatus <> 'C'
+// 			GROUP BY custcode)aa
+// 			GROUP BY custcode)bb LEFT JOIN customer.vw_customer cu on cu.customer_barcode=bb.custcode
+// 			WHERE mobile in ($match_phones)
+
+// 			order by amnt desc
+
+// 		limit 10"
+//     );
+
+//     // dd($cus_sale_amt);
+//     return $cus_sale_amt;
+// }
+
 function getPrevMonthsSaleAmounts($match_phones){
 
-    $db_ext = DB::connection('pro1208_pgsql');
+    $branch_id = getCurrentBranch();
+    $db_ext = getConnection($branch_id);
     // $match_phones = (string) implode(", ", $match_phones);
     $match_phones = implode(", ", array_map(function ($phone) {
         return "'" . addslashes($phone) . "'";
     }, $match_phones));
 
 
+    $document_from_date     =  Carbon::now()->subMonths(6)->format('Y-m-d');
+    $document_to_date     =  Carbon::now()->format('Y-m-d');
+    // dd($document_from_date,$document_to_date);
+    // $document_to_date       = $request->to_date;
+
     $cus_sale_amt = $db_ext->select(
-        "SELECT customer_barcode,mobile,amnt FROM (
-			SELECT custcode,sum(amnt) as amnt FROM (
-			SELECT custcode,sum(sumgoodamnt) as amnt
-			FROM saledata.saleorderhd sohd
-			LEFT JOIN configure.setar_emcust cus on cus.custid=sohd.custid
-			WHERE docudate between '2024-01-01' and '2024-10-01' and docustatus <> 'C'
-			GROUP BY custcode
-
-			UNION ALL
-
-			SELECT custcode,sum(sumgoodamnt) as amnt
-			FROM  saledata.salecredithd sohd
-			LEFT JOIN configure.setar_emcust cus on cus.custid=sohd.custid
-			WHERE docudate between '2024-01-01' and '2024-10-01' and docustatus <> 'C'
-			GROUP BY custcode
-
-			UNION ALL
-
-			SELECT custcode,sum(-1*saleamnt) as amnt
-			FROM   saledata.creditnotehd cnhd
-			LEFT JOIN configure.setar_emcust cus on cus.custid=cnhd.custid
-			INNER JOIN saledata.creditnotedt cndt on cnhd.saleid= cndt.saleid
-			WHERE cnhd.docudate between '2024-01-01' and '2024-10-01' and docustatus <> 'C'
-			GROUP BY custcode)aa
-			GROUP BY custcode)bb LEFT JOIN customer.vw_customer cu on cu.customer_barcode=bb.custcode
-			WHERE mobile in ($match_phones)
-
-			order by amnt desc
-
-		limit 10"
+        "
+            select custcode,mobile,sum(amnt) as totalsaleamnt
+                from
+                (
+            select customer_code as custcode,tel as mobile,sum(net_amount::numeric(19,2)) as amnt
+            from sale_cash.sale_cash_document
+            where sale_cash_document_datenow::date between '$document_from_date' and '$document_to_date'
+            and sale_cash_document_status_id <> '3'
+            and customer_code <>'99999'
+            and  sale_cash_document_type_id in ('1','2','5') --1 is CA,2 is IV, 5 is SA
+            group by custcode,mobile
+            union all
+            select customer_barcode as custcode,mobile,sum(-1*(return_product_doc_pay_amount::numeric(19,2))) as amnt
+            from return_product.return_product_doc cd
+            inner join gbh_customer cus
+            on cd.return_product_doc_gbh_customer_id=cus.gbh_customer_id
+            where return_product_doc_datenow::date between '$document_from_date' and '$document_to_date'
+            and return_product_doc_status_id <>'3'
+            and cus.customer_barcode <>'99999'
+            group by custcode,mobile
+                )as checksaleamnt
+                where mobile in ($match_phones)
+            group by custcode,mobile
+        "
     );
 
     // dd($cus_sale_amt);
     return $cus_sale_amt;
 }
+
 
 function getCardPrefix($branch_id){
 

@@ -110,7 +110,8 @@
                                 @can('edit-installer-card')
                                 <th class="text-left">Status</th>
                                 @endcan
-                                <th>Upated At</th>
+                                <th>Assigns</th>
+                                {{-- <th>Upated At</th> --}}
 
 
                             </tr>
@@ -171,7 +172,11 @@
                                             </div>
                                         </td>
                                         @endcan
-                                        <td>{{  \Carbon\Carbon::parse($installercard->updated_at)->format('d-m-Y h:i:s A') }}</td>
+                                        <td>
+                                            {{-- {!! $installercard->isAssigned() ? "<i class='fas fa-heart text-red'></i>" : "" !!} --}}
+                                            {{ $installercard->getHomeOwnerCount() }}
+                                        </td>
+                                        {{-- <td>{{  \Carbon\Carbon::parse($installercard->updated_at)->format('d-m-Y h:i:s A') }}</td> --}}
 
 
 

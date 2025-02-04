@@ -28,9 +28,19 @@ class CurrentBranchMid
         $user_uuid = $user->uuid;
         $userbranches = BranchUser::where("user_uuid",$user_uuid)->pluck("branch_id");
         $branches = Branch::whereIn("branch_id",$userbranches)->get();
+        $houser = $branches->where("branch_code","MM-001")->first();
+        // dd($houser);
         if(count($branches) == 1){
             // dd($branches->first());
             $branch_id = $branches->first()->branch_id;
+            $user->branch_id = $branch_id;
+            $user->save();
+
+            return $next($request);
+        }
+        else if($houser){
+            // dd($branches->first());
+            $branch_id = $houser->branch_id;
             $user->branch_id = $branch_id;
             $user->save();
 
