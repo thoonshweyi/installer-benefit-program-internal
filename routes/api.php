@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\InstallerCardsController;
+use App\Http\Controllers\Api\CollectionTransactionsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,4 +19,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// Route::apiResource("collectiontransactions",CollectionTransactionsController::class,["as"=>"api"]);
+// Route::apiResource("installercards",InstallerCardsController::class,["as"=>"api"]);
 

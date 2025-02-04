@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
+use App\Models\InstallerCard;
 use App\Http\Controllers\Controller;
-use App\Models\CollectionTransaction;
-use App\Http\Resources\CollectionTransactionsResource;
+use App\Http\Resources\InstallerCardsResource;
 
-class CollectionTransactionsController extends Controller
+class InstallerCardsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,8 +16,8 @@ class CollectionTransactionsController extends Controller
      */
     public function index()
     {
-        $collectiontransactions = CollectionTransaction::paginate(30);
-        return  CollectionTransactionsResource::collection($collectiontransactions);
+        $installer_cards = InstallerCard::paginate(30);
+        return  InstallerCardsResource::collection($installer_cards);
     }
 
     /**

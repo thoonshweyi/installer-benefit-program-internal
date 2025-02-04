@@ -372,19 +372,23 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col-auto">
+                                            <div class="col-auto mb-2">
                                                 <button type="button" id="" class="btn btn-primary mb-2 text-center d-flex justify-content-center align-items-center" data-toggle="modal" data-target="#addhomeownermodal"><i class="fas fa-plus"></i></button>
                                             </div>
                                             <div class="col-md-12">
-                                                <button type="submit" class="btn btn-primary my-1">Add</button>
+                                                <button type="submit" class="btn btn-primary my-1">Assign</button>
                                             </div>
 
                                         </div>
                                     </form>
                                     @endcan
 
+
+                                    <h4 class="mb-3">Assigned Home Owners</h4>
+
+
                                     <div>
-                                        <a href="javascript:void(0);" id="bulkdelete-btn" class="btn btn-danger">Bulk Delete</a>
+                                        <a href="javascript:void(0);" id="bulkdelete-btn" class="btn btn-danger">Bulk Remove</a>
                                    </div>
                                     <table class="table mb-0 tbl-server-info" id="">
                                         <thead class="bg-white text-uppercase">
@@ -417,7 +421,7 @@
                                                         <form action="{{ route('homeownerinstallers.destroy',$homeownerinstaller->id) }}" method="POST">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <a class="text-danger delete-btns" title="Delete"><i class="fas fa-trash"></i></a>
+                                                            <a class="text-danger delete-btns" title="Remove"><i class="fas fa-minus-circle"></i></i></a>
                                                         </form>
                                                     </td>
                                                     @endcan
@@ -970,7 +974,7 @@
 
             Swal.fire({
                 title: "Are you sure you want to remove a home owner?",
-                text: "Home Owner will be permanently deleted.",
+                text: "Home Owner will not be assigned to this installer.",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",

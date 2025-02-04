@@ -7,6 +7,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\TestsController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UploadController;
@@ -198,5 +199,8 @@ Route::group(['middleware' => ['auth','customauth.currentbranch']], function () 
     Route::post("/creditpointadjusts/{creditpointadjust}/approvecreditpointadjustreq",[CreditPointAdjustsController::class,'approveCreditPointAdjustReq'])->name('creditpointadjusts.approveCreditPointAdjustReq');
     Route::post("/creditpointadjusts/{creditpointadjust}/rejectcreditpointadjustreq",[CreditPointAdjustsController::class,'rejectCreditPointAdjustReq'])->name('creditpointadjusts.rejectCreditPointAdjustReq');
     Route::get('/searchcreditpointadjusts',[CreditPointAdjustsController::class,'search'])->name('creditpointadjusts.search');
+
+
+    Route::get('/tests/sync',[TestsController::class,'sync'])->name('tests.sync');
 
 });

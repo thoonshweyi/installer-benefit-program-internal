@@ -24,7 +24,10 @@ class HomeOwnersCntroller extends Controller
         // $this->middleware('permission:transfer-installer-card', ['only' => ['transfer']]);
     }
     public function index(){
-        $homeowners = HomeOwner::orderBy('id','desc')->paginate(10);
+        $branch_id = getCurrentBranch();
+
+        $homeowners = HomeOwner:: where('branch_id',$branch_id)
+                        ->orderBy('id','desc')->paginate(10);
 
         return view("homeowners.index",compact("homeowners"));
     }
