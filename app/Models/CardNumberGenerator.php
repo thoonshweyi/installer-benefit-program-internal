@@ -27,6 +27,8 @@ class CardNumberGenerator extends Model
         "approved_date",
         "remark",
         "mkt_mgr_remark",
+        "exported_by",
+        "exported_date"
     ];
 
 
