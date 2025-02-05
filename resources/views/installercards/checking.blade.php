@@ -11,10 +11,10 @@
                 <form action="" method="">
                     <div class="row">
                         <div class="col-md-12">
-                            <h5 class="text-info">Scan Installer Card</h5>
+                            {{-- <h5 class="text-info">Scan Installer Card</h5> --}}
                         </div>
                         <div class="form-group col-md-3">
-                            <input type="text" name="inscardnumber" id="inscardnumber" class="form-control inscardnumber"  readonly/>
+                            <input type="text" name="inscardnumber" id="inscardnumber" class="form-control inscardnumber" placeholder="Scan Installer Card"  readonly/>
                         </div>
                         <button type="button" id="check-btn" class="btn btn-primary document_search mr-2" style="opacity: 0">Check</button>
                     </div>
@@ -35,6 +35,31 @@
         </div>
         <!-- Page end  -->
     </div>
+
+
+    {{-- <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-6">
+                <div>
+                    <h4 class="mb-3">Installer Checking</h4>
+                </div>
+                <form action="" method="">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5 class="text-info">Scan Installer Card</h5>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <input type="text" name="inscardnumber" id="inscardnumber" class="form-control inscardnumber"  readonly/>
+                        </div>
+                        <button type="button" id="check-btn" class="btn btn-primary document_search mr-2" style="opacity: 0">Check</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <img src="{{ asset('images/secirity.jpg') }}" alt="" class="" style="width:100%;height:100vh;object-fit:cover;">
+            </div>
+        </div>
+    </div> --}}
     <!-- Modal Edit -->
 </div>
 

@@ -6,6 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pos101GbhCustomer extends Model
 {
-    protected $connection = 'pos_pgsql';
+    protected $connection = 'pos101_pgsql';
     protected $table = 'gbh_customer';
 }

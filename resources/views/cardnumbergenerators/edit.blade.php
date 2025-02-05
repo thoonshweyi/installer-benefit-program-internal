@@ -211,6 +211,25 @@
                                 </div>
                                 <span class="{{ $cardnumbergenerator->approved_date ? '' : 'text-muted font-weight-normal' }}">{{  $cardnumbergenerator->approved_date ? $cardnumbergenerator->approved_date : '' }}</span>
                             </div>
+
+                            <div class="col-md-3 mb-4 mb-md-0 transactionfooters">
+                                <p class="mb-1">Exported By</p>
+                                <span class="{{ $cardnumbergenerator->exportedby ? '' : 'text-muted font-weight-normal' }}">{{ $cardnumbergenerator->exportedby ? $cardnumbergenerator->exportedby->name : '' }}</span>
+                                @if($cardnumbergenerator->exportedby)
+                                {!!
+
+                                    "( ".implode(",", array_map(function($role){
+                                        return "<span class='roles'>$role</span>";
+                                        },$cardnumbergenerator->exportedby->getRoleNames()->toArray())
+                                    )." )"
+
+                                !!}
+                                @else
+                                        {!! "<span class='text-muted font-weight-normal roles'>(Marketing Manager)</span>" !!}
+                                @endif
+
+                                <span class="{{ $cardnumbergenerator->exported_date ? '' : 'text-muted font-weight-normal' }}">{{  $cardnumbergenerator->exported_date ? $cardnumbergenerator->exported_date : '' }}</span>
+                            </div>
                         </div>
 
 

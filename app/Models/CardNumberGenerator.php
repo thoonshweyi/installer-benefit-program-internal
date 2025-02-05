@@ -86,6 +86,9 @@ class CardNumberGenerator extends Model
     public function approvedby(){
         return $this->belongsTo(User::class,"approved_by","uuid");
     }
+    public function exportedby(){
+        return $this->belongsTo(User::class,"exported_by","uuid");
+    }
 
     public function cardnumbers(){
         return $this->hasMany(CardNumber::class,"card_number_generator_uuid","uuid");

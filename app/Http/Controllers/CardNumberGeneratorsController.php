@@ -195,12 +195,16 @@ class CardNumberGeneratorsController extends Controller
     public function export($uuid)
     {
         // dd("Excel Exported");
+        $user = Auth::user();
+        $user_uuid = $user->uuid;
         $cardnumbergenerator = CardNumberGenerator::where('uuid',$uuid)->orderBy('id','asc')->first();
         $cardnumbers = CardNumber::where('card_number_generator_uuid',$uuid)->get();
         // $qrViews = $this->generateQrCodeView($cardnumbers);
 
         $cardnumbergenerator->update([
             "status"=>"exported",
+            "exported_by"=>$user_uuid,
+            "exported_date"=>now(),
         ]);
 
 
@@ -309,6 +313,27 @@ class CardNumberGeneratorsController extends Controller
         // dd($results);
 
         return view('cardnumbergenerators.index',compact("cardnumbergenerators"));
+    }
+
+    public function exportCardNumberGenerator($uuid,Request $request){
+
+        $user = Auth::user();
+        $user_uuid = $user->uuid;
+        $cardnumbergenerator = CardNumberGenerator::where("uuid",$uuid)->first();
+        // dd($cardnumbergenerator);
+        $cardnumbergenerator->update([
+            "status"=>"approved",
+            "approved_by"=>$user_uuid,
+            "approved_date"=>now(),
+            "mkt_mgr_remark"=>$request->remark
+        ]);
+
+        // readIRENotification($uuid);
+        // sendIRENotification('Finance',$cardnumbergenerator);
+
+
+        return redirect()->back();
+
     }
 
 }
