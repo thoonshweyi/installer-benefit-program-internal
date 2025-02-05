@@ -407,3 +407,76 @@ body{
     align-items: center;
 }
 /* End Dashboard */
+
+
+/* Start Checking Card */
+.scanner-icon {
+    font-size: 28px;
+    color: #007bff;
+    transition: transform 0.3s ease-in-out;
+}
+
+.scanner-image {
+    width: 100px;
+    height: 100px;
+    /* border-radius: 50%; */
+    margin-bottom: 15px;
+    object-fit: cover;
+    animation: floatUp 1.5s infinite alternate ease-in-out;
+    margin: auto;
+}
+
+.status-box {
+    background: #cce5ff; /* Light Blue */
+    color: #004085; /* Deep Blue */
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: bold;
+    animation: fadeIn 0.8s ease-in-out;
+}
+.loading-spinner {
+    width: 18px;
+    height: 18px;
+    border: 3px solid #007bff;
+    border-top: 3px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+
+.dot-circle {
+    display: flex;
+    gap: 6px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    background: #004085; /* Deep Blue */
+    border-radius: 50%;
+    animation: dotCircle 1.5s infinite ease-in-out;
+}
+
+.dot:nth-child(1) { animation-delay: 0s; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+.dot:nth-child(4) { animation-delay: 0.6s; }
+
+@keyframes floatUp {
+    from { transform: translateY(0px); }
+    to { transform: translateY(-10px); }
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+/* End Checking Card */
+
+@keyframes dotCircle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.3); }
+}

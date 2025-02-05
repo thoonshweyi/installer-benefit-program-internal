@@ -2,8 +2,8 @@
 
 @section('content')
 <div class="content-page">
-    <div class="container-fluid">
-        {{-- <div class="row">
+    <div class="container-fluid security-areas">
+        <div class="row">
             <div class="col-lg-12">
                 <div>
                     <h4 class="mb-3">Installer Checking</h4>
@@ -11,6 +11,7 @@
                 <form action="" method="">
                     <div class="row">
                         <div class="col-md-12">
+                            {{-- <h5 class="text-info">Scan Installer Card</h5> --}}
                         </div>
                         <div class="form-group col-md-3">
                             <input type="text" name="inscardnumber" id="inscardnumber" class="form-control inscardnumber" placeholder="Scan Installer Card"  readonly/>
@@ -31,49 +32,8 @@
             @endif
 
 
-        </div> --}}
-        <!-- Page end  -->
-
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card p-4 shadow text-center">
-                    <form action="" method="">
-                        <div class="row">
-                            <img src="{{ asset('images/barcodescanner.png') }}" class="scanner-image" alt="Barcode Scanner">
-                            <div class="col-md-12">
-                                <h4><i class="fas fa-qrcode scanner-icon"></i> Scan Your Installer Card</h4>
-                            </div>
-                            <div class="input-group col-md-12 mb-3">
-                                <input type="text" name="inscardnumber" id="inscardnumber" class="form-control inscardnumber" placeholder="Tap or scan your card here.."  readonly/>
-                                <div class="input-group-append">
-                                    <span class="input-group-text scanner-icon"><i class="fas fa-barcode"></i></span>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="status-box">
-                                    {{-- <div class="loading-spinner"></div> --}}
-                                    <div class="dot-circle">
-                                        <div class="dot"></div>
-                                        <div class="dot"></div>
-                                        <div class="dot"></div>
-                                        <div class="dot"></div>
-                                    </div>
-                                    Awaiting Installer Card Scan....
-                                </div>
-                            </div>
-
-                            {{-- <div class="input-group">
-                                <input type="text" name="sale_amount[]" id="sale_amount" class="form-control" placeholder="" value="${formattedamnt}" readonly />
-                                <div class="input-group-append">
-                                    <span class="input-group-text" id="basic-addon2">MMK</span>
-                                </div>
-                            </div> --}}
-                            <button type="button" id="check-btn" class="btn btn-primary document_search mr-2" style="opacity: 0">Check</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
         </div>
+        <!-- Page end  -->
     </div>
 
 
